@@ -19,7 +19,7 @@ function required(name) {
 const env = {
   nodeEnv: process.env.NODE_ENV || 'development',
   port: parseInt(process.env.PORT, 10) || 4000,
-  frontendOrigin: process.env.FRONTEND_ORIGIN || 'http://localhost:5173',
+  frontendOrigin: process.env.FRONTEND_ORIGIN || 'http://localhost:4080',
 
   zammadUrl: required('ZAMMAD_URL'),
   zammadApiToken: required('ZAMMAD_API_TOKEN'),

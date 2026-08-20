@@ -55,10 +55,10 @@ cp backend/.env.example backend/.env
 cp frontend/.env.example frontend/.env.local
 # edita os dois ficheiros com os teus valores (ver secções 4 e 5)
 
-npm run dev                     # corre backend (porta 4000) + frontend (porta 5173)
+npm run dev                     # corre backend (porta 4000) + frontend (porta 4080)
 ```
 
-Abre `http://localhost:5173`. O Vite faz proxy de `/api/*` para o backend
+Abre `http://localhost:4080`. O Vite faz proxy de `/api/*` para o backend
 (`http://localhost:4000`), configurável em `frontend/vite.config.js`.
 
 ---
@@ -74,7 +74,7 @@ Usamos **uma única App Registration**, com duas plataformas configuradas:
      directory only" (single tenant)
    - Não definas Redirect URI ainda — fazemos isso a seguir.
 2. Em **Authentication → Add a platform → Single-page application**:
-   - Redirect URI: `http://localhost:5173` (dev) e o URL de produção (ex:
+   - Redirect URI: `http://localhost:4080` (dev) e o URL de produção (ex:
      `https://dashboard.empresa.local`)
    - Ativa "Access tokens" e "ID tokens" se pedido.
 3. Em **Expose an API**:
@@ -102,7 +102,7 @@ backend só valida tokens (não faz nenhum pedido autenticado ao Azure AD).
 | Variável | Descrição |
 |---|---|
 | `PORT` | Porta do servidor Express (default `4000`) |
-| `FRONTEND_ORIGIN` | Origem permitida pelo CORS (dev: `http://localhost:5173`) |
+| `FRONTEND_ORIGIN` | Origem permitida pelo CORS (dev: `http://localhost:4080`) |
 | `ZAMMAD_URL` | URL base da instância Zammad |
 | `ZAMMAD_API_TOKEN` | Token de API do Zammad |
 | `AZURE_TENANT_ID` | Tenant ID da App Registration |
