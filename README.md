@@ -65,7 +65,9 @@ Abre `http://localhost:4080`. O Vite faz proxy de `/api/*` para o backend
 
 ## 4. Registar a app no Azure AD
 
-Usamos **uma única App Registration**, com duas plataformas configuradas:
+Usamos **uma única App Registration**. O frontend pede só os scopes OIDC
+padrão (`openid`, `profile`, `email`) e envia o **idToken** ao backend — não
+é preciso configurar "Expose an API" nem nenhum scope customizado.
 
 1. Vai a **Azure Portal → Microsoft Entra ID → App registrations → New
    registration**.
@@ -77,21 +79,19 @@ Usamos **uma única App Registration**, com duas plataformas configuradas:
    - Redirect URI: `http://localhost:4080` (dev) e o URL de produção (ex:
      `https://dashboard.empresa.local`)
    - Ativa "Access tokens" e "ID tokens" se pedido.
-3. Em **Expose an API**:
-   - Define o "Application ID URI" (fica algo como `api://<client-id>`)
-   - **Add a scope**: nome `access_as_user`, "Who can consent": Admins and
-     users, estado: Enabled.
-4. Em **API permissions**, adiciona a scope `access_as_user` da própria app
-   (delegated) e faz "Grant admin consent" se necessário.
-5. Anota:
+3. Anota:
    - **Application (client) ID** → `AZURE_CLIENT_ID` (backend) e
      `VITE_AZURE_CLIENT_ID` (frontend) — é o mesmo valor nos dois.
    - **Directory (tenant) ID** → `AZURE_TENANT_ID` / `VITE_AZURE_TENANT_ID`.
-   - O scope completo (`api://<client-id>/access_as_user`) →
-     `VITE_API_SCOPE`.
 
 Não é necessário client secret — o frontend é uma SPA pública (PKCE), e o
-backend só valida tokens (não faz nenhum pedido autenticado ao Azure AD).
+backend só valida a assinatura/claims do idToken (não faz nenhum pedido
+autenticado ao Azure AD).
+
+> Precisas de chamar a Microsoft Graph API a partir do frontend (ex:
+> foto de perfil)? Nesse caso sim, terias de adicionar um scope como
+> `User.Read` a `loginRequest.scopes` em `frontend/src/auth/authConfig.js`
+> — mas para autenticar no backend deste dashboard não é preciso.
 
 ---
 
@@ -107,7 +107,7 @@ backend só valida tokens (não faz nenhum pedido autenticado ao Azure AD).
 | `ZAMMAD_API_TOKEN` | Token de API do Zammad |
 | `AZURE_TENANT_ID` | Tenant ID da App Registration |
 | `AZURE_CLIENT_ID` | Client ID da App Registration |
-| `AZURE_API_AUDIENCE` | Normalmente `api://<AZURE_CLIENT_ID>` |
+| `AZURE_API_AUDIENCE` | Opcional — só necessário se usares um scope de API customizado (ver secção 4) |
 | `ALLOWED_ADMINS` | Emails com acesso total, separados por vírgulas |
 | `ALLOWED_VIEWERS` | Emails com acesso só de leitura, separados por vírgulas |
 | `LOG_CONTAINERS` | Whitelist de nomes de containers visíveis em Logs |
@@ -120,7 +120,6 @@ backend só valida tokens (não faz nenhum pedido autenticado ao Azure AD).
 |---|---|
 | `VITE_AZURE_CLIENT_ID` | Igual a `AZURE_CLIENT_ID` do backend |
 | `VITE_AZURE_TENANT_ID` | Igual a `AZURE_TENANT_ID` do backend |
-| `VITE_API_SCOPE` | `api://<client-id>/access_as_user` |
 | `VITE_REDIRECT_URI` | URL onde o frontend corre |
 | `VITE_DEFAULT_REFRESH_SECONDS` | Intervalo de auto-refresh por omissão |
 

@@ -20,7 +20,10 @@ async function acquireToken() {
   try {
     const result = await msalInstance.acquireTokenSilent({ ...loginRequest, account });
     console.log('[api] token adquirido em silêncio, scopes:', result.scopes);
-    return result.accessToken;
+    // Usamos o idToken (não o accessToken): não pedimos nenhum scope de API
+    // customizado, só openid/profile/email — o backend valida o idToken
+    // diretamente (aud = AZURE_CLIENT_ID). Ver authConfig.js.
+    return result.idToken;
   } catch (err) {
     console.error('[api] acquireTokenSilent() ERRO:', err.errorCode, err.errorMessage, err);
     if (err instanceof InteractionRequiredAuthError) {
