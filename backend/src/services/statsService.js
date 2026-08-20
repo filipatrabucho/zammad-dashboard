@@ -63,10 +63,13 @@ async function getOverview({ days = 30 } = {}) {
       closedToday,
       slaAtRisk,
     },
-    byState: countBy(openTickets, (t) => t.state).map((x) => ({ state: x.key, count: x.count })),
-    byGroup: countBy(openTickets, (t) => t.group).map((x) => ({ group: x.key, count: x.count })),
+    // Estas três distribuições refletem os tickets CRIADOS no período
+    // selecionado (7d/14d/30d/90d) — é o que muda quando o utilizador troca
+    // o período no Overview. `totals.open` acima é sempre o valor "agora".
+    byState: countBy(periodTickets, (t) => t.state).map((x) => ({ state: x.key, count: x.count })),
+    byGroup: countBy(periodTickets, (t) => t.group).map((x) => ({ group: x.key, count: x.count })),
     byAssignee: countBy(
-      openTickets.filter((t) => t.owner && t.owner !== '-'),
+      periodTickets.filter((t) => t.owner && t.owner !== '-'),
       (t) => t.owner
     ).map((x) => ({ assignee: x.key, count: x.count })),
   };

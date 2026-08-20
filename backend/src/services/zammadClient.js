@@ -69,7 +69,16 @@ async function searchTickets(params = {}) {
 }
 
 async function getTicket(id) {
-  return request({ method: 'GET', url: `/tickets/${id}`, params: { all: true } });
+  // expand=true (tal como na pesquisa) devolve o ticket "achatado", com
+  // state/group/owner como strings legíveis em vez de *_id numéricos.
+  // As mensagens não vêm incluídas nesse pedido, por isso buscamos os
+  // artigos à parte e juntamos tudo numa única estrutura para o frontend.
+  const [ticket, articles] = await Promise.all([
+    request({ method: 'GET', url: `/tickets/${id}`, params: { expand: true } }),
+    request({ method: 'GET', url: `/ticket_articles/by_ticket/${id}` }).catch(() => []),
+  ]);
+
+  return { ...ticket, articles: Array.isArray(articles) ? articles : [] };
 }
 
 async function listGroups() {

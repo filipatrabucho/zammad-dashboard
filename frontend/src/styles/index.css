@@ -821,6 +821,10 @@ input:focus {
   overflow: auto;
 }
 
+.ticket-article-body-text {
+  white-space: pre-wrap;
+}
+
 /* ---------- Login ---------- */
 
 .login-page {

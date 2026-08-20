@@ -34,7 +34,7 @@ export default function LogsPage() {
       <div className="page-header">
         <div>
           <h1>Logs</h1>
-          <p className="page-subtitle">docker compose logs — apenas administradores</p>
+          <p className="page-subtitle">docker logs — apenas administradores</p>
         </div>
         <RefreshControl seconds={intervalSeconds} onChange={setIntervalSeconds} onRefreshNow={refresh} />
       </div>

@@ -10,6 +10,7 @@
     "lint": "echo \"(sem linter configurado)\" && exit 0"
   },
   "dependencies": {
+    "@ant-design/icons": "^5.5.2",
     "@azure/msal-browser": "^3.28.0",
     "@azure/msal-react": "^2.2.0",
     "axios": "^1.7.9",

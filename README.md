@@ -164,7 +164,9 @@ docker compose up -d --build
 O `Dockerfile` faz build do frontend e corre o backend, que serve tudo numa
 porta só (`4000` por omissão). O `docker-compose.yml` monta o socket do
 Docker do host (só leitura) para a página de **Logs** poder correr
-`docker compose logs` sobre os containers do Zammad.
+`docker logs` sobre os containers do Zammad, pelo nome real de cada um
+(ver `LOG_CONTAINERS` na secção 5 — usa `docker ps --format '{{.Names}}'`
+no servidor para os encontrares).
 
 ### Opção B — PM2 (sem Docker)
 
@@ -235,7 +237,7 @@ Bearer <token>` válido e o email do utilizador numa das listas do `.env`.
 | `GET /api/stats/overview?days=30` | Agregações (por estado/grupo/assignee, KPIs) | admin/viewer |
 | `GET /api/stats/timeseries?days=30` | Série temporal criados vs fechados | admin/viewer |
 | `GET /api/logs` | Lista de containers permitidos | **admin** |
-| `GET /api/logs/:container?tail=200` | `docker compose logs` do container | **admin** |
+| `GET /api/logs/:container?tail=200` | `docker logs` do container | **admin** |
 
 Notas de segurança implementadas:
 

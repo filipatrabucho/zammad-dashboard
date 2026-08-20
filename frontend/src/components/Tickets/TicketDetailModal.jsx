@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { CloseOutlined } from '@ant-design/icons';
 import { getTicket } from '../../api/endpoints';
 import LoadingSpinner from '../Common/LoadingSpinner';
 import ErrorBanner from '../Common/ErrorBanner';
@@ -44,7 +45,7 @@ export default function TicketDetailModal({ ticketId, onClose }) {
         <div className="modal-header">
           <h2>Ticket #{ticket?.number || ticketId}</h2>
           <button type="button" className="modal-close" onClick={onClose} aria-label="Fechar">
-            ✕
+            <CloseOutlined />
           </button>
         </div>
         <div className="modal-body">
@@ -76,11 +77,16 @@ export default function TicketDetailModal({ ticketId, onClose }) {
                         <strong>{a.from || 'Sistema'}</strong>
                         <span>{formatDate(a.created_at)}</span>
                       </div>
-                      <div
-                        className="ticket-article-body"
-                        // eslint-disable-next-line react/no-danger
-                        dangerouslySetInnerHTML={{ __html: a.body_html || a.body || '' }}
-                      />
+                      {a.content_type?.includes('html') ? (
+                        <div
+                          className="ticket-article-body"
+                          // Zammad já sanitiza o HTML dos artigos antes de o devolver.
+                          // eslint-disable-next-line react/no-danger
+                          dangerouslySetInnerHTML={{ __html: a.body || '' }}
+                        />
+                      ) : (
+                        <div className="ticket-article-body ticket-article-body-text">{a.body}</div>
+                      )}
                     </div>
                   ))}
                 </div>

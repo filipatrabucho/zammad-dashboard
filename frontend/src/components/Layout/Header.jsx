@@ -1,4 +1,5 @@
 import { useMsal } from '@azure/msal-react';
+import { MenuOutlined, LogoutOutlined } from '@ant-design/icons';
 import { useAuthProfile } from '../../auth/AuthContext';
 import ConnectionStatus from '../Common/ConnectionStatus';
 
@@ -13,7 +14,7 @@ export default function Header({ onMenuClick }) {
   return (
     <header className="header">
       <button type="button" className="menu-toggle" onClick={onMenuClick} aria-label="Abrir menu">
-        ☰
+        <MenuOutlined />
       </button>
       <div className="header-spacer" />
       <ConnectionStatus />
@@ -24,6 +25,7 @@ export default function Header({ onMenuClick }) {
         </div>
       )}
       <button type="button" className="btn-secondary" onClick={handleLogout}>
+        <LogoutOutlined />
         Sair
       </button>
     </header>

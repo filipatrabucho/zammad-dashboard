@@ -1,8 +1,11 @@
+import { ExclamationCircleOutlined } from '@ant-design/icons';
+
 export default function ErrorBanner({ message, onRetry }) {
   if (!message) return null;
   return (
     <div className="error-banner" role="alert">
-      <span>⚠ {message}</span>
+      <ExclamationCircleOutlined />
+      <span>{message}</span>
       {onRetry && (
         <button type="button" className="btn-link" onClick={onRetry}>
           Tentar novamente

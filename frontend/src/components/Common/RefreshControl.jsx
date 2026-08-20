@@ -1,3 +1,5 @@
+import { ReloadOutlined } from '@ant-design/icons';
+
 const OPTIONS = [
   { value: 0, label: 'Manual' },
   { value: 15, label: '15s' },
@@ -9,7 +11,7 @@ export default function RefreshControl({ seconds, onChange, onRefreshNow }) {
   return (
     <div className="refresh-control">
       <button type="button" className="btn-secondary btn-icon" onClick={onRefreshNow} title="Atualizar agora">
-        ⟳
+        <ReloadOutlined />
       </button>
       <select value={seconds} onChange={(e) => onChange(Number(e.target.value))} aria-label="Intervalo de auto-refresh">
         {OPTIONS.map((opt) => (

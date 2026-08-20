@@ -1,11 +1,12 @@
 import { NavLink } from 'react-router-dom';
+import { DashboardOutlined, TagsOutlined, TeamOutlined, FileTextOutlined } from '@ant-design/icons';
 import { useAuthProfile } from '../../auth/AuthContext';
 
 const navItems = [
-  { to: '/', label: 'Overview', icon: '📊', end: true },
-  { to: '/tickets', label: 'Tickets', icon: '🎫' },
-  { to: '/groups', label: 'Grupos', icon: '👥' },
-  { to: '/logs', label: 'Logs', icon: '📜', adminOnly: true },
+  { to: '/', label: 'Overview', icon: DashboardOutlined, end: true },
+  { to: '/tickets', label: 'Tickets', icon: TagsOutlined },
+  { to: '/groups', label: 'Grupos', icon: TeamOutlined },
+  { to: '/logs', label: 'Logs', icon: FileTextOutlined, adminOnly: true },
 ];
 
 export default function Sidebar({ open, onClose }) {
@@ -29,9 +30,7 @@ export default function Sidebar({ open, onClose }) {
                 className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
                 onClick={onClose}
               >
-                <span className="sidebar-icon" aria-hidden="true">
-                  {item.icon}
-                </span>
+                <item.icon className="sidebar-icon" aria-hidden="true" />
                 {item.label}
               </NavLink>
             ))}

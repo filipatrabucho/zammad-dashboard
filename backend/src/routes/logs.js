@@ -19,6 +19,13 @@ router.get('/', (req, res) => {
  * Restrita a admins (ver mount em app.js). O nome do container é
  * SEMPRE validado contra a whitelist LOG_CONTAINERS — nunca passamos
  * input livre do utilizador para `execFile`/shell.
+ *
+ * Usamos `docker logs` (não `docker compose logs`): este processo não tem
+ * acesso ao ficheiro docker-compose.yml da stack do Zammad, só ao socket
+ * do Docker (montado no docker-compose.yml deste projeto) — `docker logs`
+ * funciona diretamente pelo nome/ID do container, sem precisar desse
+ * ficheiro. Usa `docker ps --format '{{.Names}}'` no servidor para veres
+ * os nomes reais dos containers a colocar em LOG_CONTAINERS.
  */
 router.get('/:container', (req, res, next) => {
   const { container } = req.params;
@@ -37,16 +44,22 @@ router.get('/:container', (req, res, next) => {
   // nunca passam por um interpretador de shell.
   execFile(
     'docker',
-    ['compose', 'logs', '--no-color', '--tail', String(tail), container],
+    ['logs', '--tail', String(tail), container],
     { timeout: 15000, maxBuffer: 5 * 1024 * 1024 },
     (err, stdout, stderr) => {
-      if (err && !stdout) {
-        const error = new Error('Não foi possível obter os logs do container.');
+      if (err && !stdout && !stderr) {
+        console.error('[logs] docker logs "%s" ERRO:', container, err.message);
+        const error = new Error(
+          `Não foi possível obter os logs do container "${container}": ${err.message}`
+        );
         error.status = 502;
         error.expose = true;
         return next(error);
       }
-      return res.json({ container, tail, logs: stdout || stderr || '' });
+      // `docker logs` escreve tudo em stderr por omissão (comportamento
+      // normal do Docker) — por isso juntamos os dois em vez de tratar
+      // stderr como falha.
+      return res.json({ container, tail, logs: [stdout, stderr].filter(Boolean).join('') });
     }
   );
 });
