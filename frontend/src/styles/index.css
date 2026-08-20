@@ -913,6 +913,9 @@ input:focus {
   align-items: center;
   gap: 12px;
   font-size: 13px;
+  text-align: left;
+  overflow-wrap: anywhere;
+  width: 100%;
 }
 
 /* ---------- Responsive ---------- */

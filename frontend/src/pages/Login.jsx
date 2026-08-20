@@ -1,5 +1,7 @@
 import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../auth/authConfig';
+import { msalInitError } from '../auth/msalInstance';
+import ErrorBanner from '../components/Common/ErrorBanner';
 
 export default function Login() {
   const { instance } = useMsal();
@@ -16,6 +18,11 @@ export default function Login() {
           <h1>Zammad Dashboard</h1>
         </div>
         <p className="login-subtitle">Acesso restrito. Inicia sessão com a tua conta Microsoft.</p>
+        {msalInitError && (
+          <ErrorBanner
+            message={`Falha no login Microsoft: ${msalInitError.errorMessage || msalInitError.message}`}
+          />
+        )}
         <button type="button" className="btn-primary btn-microsoft" onClick={handleLogin}>
           <MicrosoftLogo />
           Login com Microsoft

@@ -3,6 +3,11 @@ import { msalConfig } from './authConfig';
 
 export const msalInstance = new PublicClientApplication(msalConfig);
 
+// Erro do redirect de login mais recente (ex: má configuração no Azure AD),
+// para a UI conseguir mostrar algo em vez de voltar silenciosamente ao ecrã
+// de login sem explicação. Ver Login.jsx.
+export let msalInitError = null;
+
 /**
  * No msal-browser v3, a instância TEM de ser inicializada (async) antes de
  * qualquer outra chamada — getAllAccounts, loginRedirect, acquireTokenSilent,
@@ -23,6 +28,7 @@ export async function initializeMsal() {
     console.log('[msal] handleRedirectPromise() resultado:', redirectResult);
   } catch (err) {
     console.error('[msal] handleRedirectPromise() ERRO:', err.errorCode, err.errorMessage, err);
+    msalInitError = err;
   }
 
   const accounts = msalInstance.getAllAccounts();
