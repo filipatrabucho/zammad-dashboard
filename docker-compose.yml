@@ -1,0 +1,21 @@
+services:
+  zammad-dashboard:
+    build: .
+    container_name: zammad-dashboard
+    restart: unless-stopped
+    env_file:
+      - backend/.env
+    ports:
+      # Expor apenas na interface interna da rede local (ver item 47 do README).
+      # Exemplo: "192.168.1.10:4000:4000" em vez de publicar em todas as interfaces.
+      - "4000:4000"
+    volumes:
+      # Necessário para a página de Logs correr `docker compose logs`
+      # sobre os containers do Zammad a partir de dentro do container.
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - internal
+
+networks:
+  internal:
+    driver: bridge
