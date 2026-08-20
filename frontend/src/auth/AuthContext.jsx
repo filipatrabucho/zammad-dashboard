@@ -10,12 +10,15 @@ export function AuthContextProvider({ children }) {
   const [status, setStatus] = useState('idle'); // idle | loading | ready | denied | error
 
   const load = useCallback(async () => {
+    console.log('[auth] a chamar GET /api/auth/me…');
     setStatus('loading');
     try {
       const me = await getMe();
+      console.log('[auth] /api/auth/me OK:', me);
       setProfile(me);
       setStatus('ready');
     } catch (err) {
+      console.error('[auth] /api/auth/me ERRO:', err.response?.status, err.response?.data || err.message);
       if (err.response?.status === 403) {
         setStatus('denied');
       } else {
@@ -25,6 +28,7 @@ export function AuthContextProvider({ children }) {
   }, []);
 
   useEffect(() => {
+    console.log('[auth] isAuthenticated (MSAL) mudou para:', isAuthenticated);
     if (isAuthenticated) {
       load();
     } else {

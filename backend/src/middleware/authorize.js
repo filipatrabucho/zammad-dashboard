@@ -9,6 +9,8 @@ function authorize(req, res, next) {
   const email = req.user && req.user.email;
   const role = getRole(email);
 
+  console.log('[authorize] email="%s" -> role=%s', email, role || 'NENHUM (não autorizado)');
+
   if (!role) {
     return res.status(403).json({
       error: 'Acesso negado. O teu email não está autorizado a usar este dashboard.',

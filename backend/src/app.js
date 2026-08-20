@@ -23,9 +23,17 @@ const app = express();
 
 app.disable('x-powered-by');
 app.use(helmet());
+console.log('[cors] origem permitida (FRONTEND_ORIGIN):', env.frontendOrigin);
 app.use(
   cors({
-    origin: env.frontendOrigin,
+    origin: (origin, callback) => {
+      // Sem `origin` = pedido same-origin ou ferramenta tipo curl — permitir.
+      if (!origin || origin === env.frontendOrigin) {
+        return callback(null, true);
+      }
+      console.warn('[cors] origem BLOQUEADA: "%s" (esperado: "%s")', origin, env.frontendOrigin);
+      return callback(new Error('Origem não permitida por CORS.'));
+    },
     credentials: true,
   })
 );
