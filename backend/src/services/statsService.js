@@ -35,10 +35,15 @@ async function getOverview({ days = 30 } = {}) {
   const since = new Date();
   since.setDate(since.getDate() - days);
   const sinceIso = since.toISOString();
+  // A pesquisa do Zammad (Lucene/Elasticsearch) usa ":" como separador
+  // campo:valor — um timestamp ISO completo (com hora) tem ":" dentro do
+  // próprio valor e parte a query, devolvendo sempre 0 resultados. Usar só
+  // a data (sem hora) evita o problema.
+  const sinceDate = isoDate(since);
 
   const [openTickets, periodTickets] = await Promise.all([
     zammad.fetchTicketsForStats({ query: 'state.name:open OR state.name:new OR state.name:pending*', limit: 1500 }),
-    zammad.fetchTicketsForStats({ query: `created_at:>=${sinceIso}`, limit: 1500 }),
+    zammad.fetchTicketsForStats({ query: `created_at:>=${sinceDate}`, limit: 1500 }),
   ]);
 
   const createdInPeriod = periodTickets.length;
@@ -81,9 +86,9 @@ async function getOverview({ days = 30 } = {}) {
 async function getTimeseries({ days = 30 } = {}) {
   const since = new Date();
   since.setDate(since.getDate() - days);
-  const sinceIso = since.toISOString();
+  const sinceDate = isoDate(since);
 
-  const tickets = await zammad.fetchTicketsForStats({ query: `created_at:>=${sinceIso}`, limit: 3000 });
+  const tickets = await zammad.fetchTicketsForStats({ query: `created_at:>=${sinceDate}`, limit: 3000 });
 
   const buckets = new Map();
   for (let i = 0; i <= days; i += 1) {

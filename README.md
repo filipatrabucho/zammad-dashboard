@@ -250,6 +250,23 @@ Notas de segurança implementadas:
 - Erros do Zammad (offline, timeout, token inválido) são tratados de forma
   consistente e nunca expõem detalhes internos ao cliente.
 
+### A página de Logs só funciona onde o Docker estiver acessível
+
+`GET /api/logs/:container` corre literalmente `docker logs <container>` no
+processo do backend. Isto só funciona se esse processo tiver acesso ao
+**mesmo Docker daemon** que corre os containers do Zammad:
+
+- Em produção (Docker, secção 7 opção A) isso já está tratado — o
+  `docker-compose.yml` monta `/var/run/docker.sock` no container do
+  dashboard.
+- Se correres o backend localmente com `npm run dev` (ex: no teu portátil,
+  fora do servidor onde o Zammad realmente corre), a página de Logs **não
+  vai funcionar** — vais ver um erro tipo `failed to connect to the docker
+  API at npipe:////./pipe/dockerDesktopLinuxEngine` (Windows) ou `Cannot
+  connect to the Docker daemon` (Linux/Mac), porque não há nenhum Docker
+  local a correr esses containers. Isto é esperado, não é um bug — testa
+  esta página já no servidor de produção, ou junto do Zammad.
+
 ---
 
 ## 10. Limitações conhecidas

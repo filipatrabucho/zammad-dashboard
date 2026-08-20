@@ -47,18 +47,19 @@ router.get('/:container', (req, res, next) => {
     ['logs', '--tail', String(tail), container],
     { timeout: 15000, maxBuffer: 5 * 1024 * 1024 },
     (err, stdout, stderr) => {
-      if (err && !stdout && !stderr) {
-        console.error('[logs] docker logs "%s" ERRO:', container, err.message);
+      // `docker logs` escreve o output normal em stderr (comportamento do
+      // Docker), por isso só tratamos como erro quando o processo `docker`
+      // falhou mesmo (exit code != 0) — não quando stderr só tem os logs.
+      if (err) {
+        const detail = (stderr || err.message || '').trim();
+        console.error('[logs] docker logs "%s" ERRO:', container, detail);
         const error = new Error(
-          `Não foi possível obter os logs do container "${container}": ${err.message}`
+          `Não foi possível obter os logs do container "${container}": ${detail}`
         );
         error.status = 502;
         error.expose = true;
         return next(error);
       }
-      // `docker logs` escreve tudo em stderr por omissão (comportamento
-      // normal do Docker) — por isso juntamos os dois em vez de tratar
-      // stderr como falha.
       return res.json({ container, tail, logs: [stdout, stderr].filter(Boolean).join('') });
     }
   );
