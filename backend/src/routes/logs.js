@@ -51,8 +51,21 @@ router.get('/:container', (req, res, next) => {
       // Docker), por isso só tratamos como erro quando o processo `docker`
       // falhou mesmo (exit code != 0) — não quando stderr só tem os logs.
       if (err) {
-        const detail = (stderr || err.message || '').trim();
+        let detail = (stderr || err.message || '').trim();
         console.error('[logs] docker logs "%s" ERRO:', container, detail);
+
+        // Erro clássico quando o backend corre numa máquina sem daemon
+        // Docker local (ex: Windows sem Docker Desktop a correr, ou o
+        // Zammad vive noutro host). Ver DOCKER_HOST no backend/.env.example.
+        const looksLikeNoLocalDaemon = /dockerDesktopLinuxEngine|docker\.sock|daemon is running/i.test(
+          detail
+        );
+        if (looksLikeNoLocalDaemon && !process.env.DOCKER_HOST) {
+          detail +=
+            '\n\nEste backend não tem um daemon Docker local. Se o Zammad corre noutra máquina, ' +
+            'define DOCKER_HOST no backend/.env a apontar para lá (ex: ssh://user@servidor) — ver .env.example.';
+        }
+
         const error = new Error(
           `Não foi possível obter os logs do container "${container}": ${detail}`
         );

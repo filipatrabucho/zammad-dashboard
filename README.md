@@ -264,8 +264,30 @@ processo do backend. Isto só funciona se esse processo tiver acesso ao
   vai funcionar** — vais ver um erro tipo `failed to connect to the docker
   API at npipe:////./pipe/dockerDesktopLinuxEngine` (Windows) ou `Cannot
   connect to the Docker daemon` (Linux/Mac), porque não há nenhum Docker
-  local a correr esses containers. Isto é esperado, não é um bug — testa
-  esta página já no servidor de produção, ou junto do Zammad.
+  local a correr esses containers. Isto é esperado, não é um bug.
+
+**Alternativa sem mudar onde o backend corre**: define `DOCKER_HOST` no
+`backend/.env` a apontar para o Docker do servidor via SSH — o `docker` CLI
+lê essa variável automaticamente (não é preciso nenhuma alteração de
+código):
+
+```bash
+DOCKER_HOST=ssh://utilizador@ip-ou-hostname-do-servidor
+```
+
+Pré-requisitos no servidor Linux:
+1. O utilizador SSH usado consegue autenticar-se **sem password** a partir
+   da máquina onde corre o backend (chave SSH). Testa primeiro no terminal:
+   `ssh utilizador@servidor docker ps` — se isso pedir password ou falhar,
+   o `DOCKER_HOST` também vai falhar.
+2. Esse utilizador consegue correr `docker` no servidor sem `sudo`
+   (normalmente por estar no grupo `docker`: `sudo usermod -aG docker
+   utilizador`, depois nova sessão SSH).
+
+Com isto o dashboard pode continuar a correr onde for mais conveniente em
+desenvolvimento, enquanto os Logs falam com o Docker remoto por SSH. Em
+produção continua a ser preferível correr o backend no mesmo servidor
+(secção 7, opção A) — mais simples e sem dependência de SSH.
 
 ---
 
