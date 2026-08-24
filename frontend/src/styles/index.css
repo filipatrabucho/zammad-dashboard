@@ -1436,6 +1436,59 @@ input:focus {
   color: #f0a9a3;
 }
 
+.kpi-tile-sub {
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.kpi-tile-alert .kpi-tile-sub {
+  color: #d98884;
+}
+
+/* ---------- Stale tickets list (wallboard) ---------- */
+
+.stale-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+  overflow: hidden;
+}
+
+.stale-row {
+  display: grid;
+  grid-template-columns: 1fr 140px 56px;
+  align-items: center;
+  gap: 14px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+
+.stale-row:last-child {
+  border-bottom: none;
+}
+
+.stale-title {
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stale-owner {
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stale-time {
+  color: var(--text-muted);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
 @media (max-width: 1400px) {
   .kpi-sidebar {
     flex-basis: 210px;

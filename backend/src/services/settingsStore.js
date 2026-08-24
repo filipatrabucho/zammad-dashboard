@@ -16,10 +16,12 @@ const DEFAULT_SETTINGS = {
     kpiCreatedToday: true,
     kpiClosedToday: true,
     kpiSlaAtRisk: true,
+    kpiUnassignedQueue: true,
     chartTimeseries: true,
     chartByState: true,
     chartByGroup: true,
     chartByAssignee: true,
+    chartStaleTickets: true,
   },
 };
 

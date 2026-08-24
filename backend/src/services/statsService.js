@@ -58,6 +58,30 @@ async function getOverview({ days = 30 } = {}) {
   const closedToday = periodTickets.filter((t) => t.close_at && isoDate(t.close_at) === isoDate(new Date())).length;
   const createdToday = periodTickets.filter((t) => isoDate(t.created_at) === isoDate(new Date())).length;
 
+  // Fila sem atribuição: tickets abertos sem owner ("-" é a convenção do
+  // Zammad para "por atribuir"). Reportamos a contagem e há quanto tempo
+  // está à espera o mais antigo deles.
+  const unassignedTickets = openTickets.filter((t) => !t.owner || t.owner === '-');
+  const unassignedOpen = unassignedTickets.length;
+  const unassignedOldestWaitMs = unassignedTickets.length
+    ? now - Math.min(...unassignedTickets.map((t) => new Date(t.created_at).getTime()))
+    : null;
+
+  // Tickets sem resposta há mais tempo: os tickets abertos com a
+  // atualização mais antiga (proxy razoável para "ninguém mexe nisto há
+  // muito tempo", sem depender de campos do Zammad que podem não existir
+  // em todas as versões, como last_contact_*).
+  const staleTickets = [...openTickets]
+    .sort((a, b) => new Date(a.updated_at || a.created_at) - new Date(b.updated_at || b.created_at))
+    .slice(0, 8)
+    .map((t) => ({
+      id: t.id,
+      number: t.number,
+      title: t.title,
+      owner: t.owner,
+      lastActivityAt: t.updated_at || t.created_at,
+    }));
+
   return {
     period: { days, since: sinceIso },
     totals: {
@@ -67,6 +91,8 @@ async function getOverview({ days = 30 } = {}) {
       createdToday,
       closedToday,
       slaAtRisk,
+      unassignedOpen,
+      unassignedOldestWaitMs,
     },
     // Estas três distribuições refletem os tickets CRIADOS no período
     // selecionado (7d/14d/30d/90d) — é o que muda quando o utilizador troca
@@ -77,6 +103,7 @@ async function getOverview({ days = 30 } = {}) {
       periodTickets.filter((t) => t.owner && t.owner !== '-'),
       (t) => t.owner
     ).map((x) => ({ assignee: x.key, count: x.count })),
+    staleTickets,
   };
 }
 
