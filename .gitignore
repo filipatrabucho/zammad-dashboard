@@ -7,6 +7,7 @@ dist/
 build/
 frontend/dist/
 backend/public/
+backend/data/
 *.log
 .DS_Store
 coverage/

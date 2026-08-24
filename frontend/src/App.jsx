@@ -3,6 +3,7 @@ import { AuthenticatedTemplate, UnauthenticatedTemplate } from '@azure/msal-reac
 import ProtectedRoute from './components/Common/ProtectedRoute';
 import Login from './pages/Login';
 import Wallboard from './pages/Wallboard';
+import Backoffice from './pages/Backoffice';
 
 // Modo interativo completo (Tickets/Grupos/Logs) — POSTO EM PAUSA por agora
 // enquanto o dashboard é usado como ecrã fixo na Sala IT (só o Wallboard).
@@ -29,6 +30,15 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Wallboard />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/backoffice"
+            element={
+              <ProtectedRoute adminOnly>
+                <Backoffice />
               </ProtectedRoute>
             }
           />

@@ -22,3 +22,8 @@ export const getLogContainers = () => apiClient.get('/logs').then((r) => r.data)
 
 export const getLogs = (container, tail) =>
   apiClient.get(`/logs/${encodeURIComponent(container)}`, { params: { tail } }).then((r) => r.data);
+
+export const getWallboardSettings = () => apiClient.get('/settings/wallboard').then((r) => r.data);
+
+export const updateWallboardSettings = (payload) =>
+  apiClient.put('/settings/wallboard', payload).then((r) => r.data);

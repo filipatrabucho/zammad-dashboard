@@ -1,16 +1,26 @@
 import { FolderOpenOutlined, PlusCircleOutlined, CheckCircleOutlined, WarningOutlined } from '@ant-design/icons';
 
 const items = [
-  { key: 'open', label: 'Tickets abertos', icon: FolderOpenOutlined, hero: true },
-  { key: 'createdToday', label: 'Criados hoje', icon: PlusCircleOutlined },
-  { key: 'closedToday', label: 'Fechados hoje', icon: CheckCircleOutlined },
-  { key: 'slaAtRisk', label: 'SLA em risco', icon: WarningOutlined, alertWhenPositive: true },
+  { key: 'open', widgetKey: 'kpiOpen', label: 'Tickets abertos', icon: FolderOpenOutlined, hero: true },
+  { key: 'createdToday', widgetKey: 'kpiCreatedToday', label: 'Criados hoje', icon: PlusCircleOutlined },
+  { key: 'closedToday', widgetKey: 'kpiClosedToday', label: 'Fechados hoje', icon: CheckCircleOutlined },
+  {
+    key: 'slaAtRisk',
+    widgetKey: 'kpiSlaAtRisk',
+    label: 'SLA em risco',
+    icon: WarningOutlined,
+    alertWhenPositive: true,
+  },
 ];
 
-export default function KpiSidebar({ totals }) {
+export default function KpiSidebar({ totals, widgets }) {
+  const visible = items.filter((item) => !widgets || widgets[item.widgetKey] !== false);
+
+  if (visible.length === 0) return null;
+
   return (
     <div className="kpi-sidebar">
-      {items.map((item) => {
+      {visible.map((item) => {
         const value = totals ? totals[item.key] ?? 0 : null;
         const alert = item.alertWhenPositive && value > 0;
         return (
