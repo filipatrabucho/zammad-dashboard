@@ -23,12 +23,17 @@ function CustomTooltip({ active, payload, label }) {
   );
 }
 
-export default function TimeSeriesChart({ data, dark = false, subtitle = 'Evolução diária no período selecionado' }) {
+export default function TimeSeriesChart({
+  data,
+  dark = false,
+  subtitle = 'Evolução diária no período selecionado',
+  height = 280,
+}) {
   const { categorical, ink } = getPalette(dark);
 
   return (
     <ChartCard title="Tickets criados vs fechados" subtitle={subtitle}>
-      <ResponsiveContainer width="100%" height={280}>
+      <ResponsiveContainer width="100%" height={height}>
         <AreaChart data={data || []} margin={{ top: 8, right: 12, left: -12, bottom: 0 }}>
           <defs>
             <linearGradient id="fillCreated" x1="0" y1="0" x2="0" y2="1">

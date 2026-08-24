@@ -8,7 +8,7 @@ export default function ConnectionStatus() {
   return (
     <div className={`connection-status ${online ? 'online' : 'offline'}`} title="Estado da ligação ao Zammad">
       <span className="dot" />
-      {online ? 'Zammad online' : data ? 'Zammad offline' : 'A verificar…'}
+      {online ? 'Online' : data ? 'Offline' : 'A verificar…'}
     </div>
   );
 }

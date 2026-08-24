@@ -17,14 +17,14 @@ function CustomTooltip({ active, payload, label, sequentialBlue }) {
   );
 }
 
-export default function GroupBarChart({ byGroup, dark = false, interactive = true }) {
+export default function GroupBarChart({ byGroup, dark = false, interactive = true, height = 280, limit = 10 }) {
   const navigate = useNavigate();
   const { ink, sequentialBlue } = getPalette(dark);
-  const data = (byGroup || []).slice(0, 10).map((g) => ({ name: g.group, value: g.count }));
+  const data = (byGroup || []).slice(0, limit).map((g) => ({ name: g.group, value: g.count }));
 
   return (
     <ChartCard title="Tickets por grupo" subtitle={interactive ? 'Clica numa barra para ver os tickets' : undefined}>
-      <ResponsiveContainer width="100%" height={280}>
+      <ResponsiveContainer width="100%" height={height}>
         <BarChart data={data} layout="vertical" margin={{ top: 8, right: 16, left: 8, bottom: 0 }}>
           <CartesianGrid horizontal={false} stroke={ink.gridline} />
           <XAxis type="number" tick={{ fill: ink.muted, fontSize: 12 }} axisLine={false} tickLine={false} allowDecimals={false} />

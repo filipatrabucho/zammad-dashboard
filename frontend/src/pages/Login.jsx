@@ -2,6 +2,7 @@ import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../auth/authConfig';
 import { msalInitError } from '../auth/msalInstance';
 import ErrorBanner from '../components/Common/ErrorBanner';
+import BrandMark from '../components/Common/BrandMark';
 
 export default function Login() {
   const { instance } = useMsal();
@@ -14,8 +15,8 @@ export default function Login() {
     <div className="login-page">
       <div className="login-card">
         <div className="login-brand">
-          <span className="brand-mark">Z</span>
-          <h1>Zammad Dashboard</h1>
+          <BrandMark size={40} />
+          <h1>PKF Helpdesk</h1>
         </div>
         <p className="login-subtitle">Acesso restrito. Inicia sessão com a tua conta Microsoft.</p>
         {msalInitError && (

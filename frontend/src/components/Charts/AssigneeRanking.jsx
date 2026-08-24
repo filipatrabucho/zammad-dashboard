@@ -1,9 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import ChartCard from './ChartCard';
 
-export default function AssigneeRanking({ byAssignee, interactive = true }) {
+export default function AssigneeRanking({ byAssignee, interactive = true, limit = 10 }) {
   const navigate = useNavigate();
-  const data = (byAssignee || []).slice(0, 10);
+  const data = (byAssignee || []).slice(0, limit);
   const max = data.reduce((m, d) => Math.max(m, d.count), 0) || 1;
   const Tag = interactive ? 'button' : 'div';
 

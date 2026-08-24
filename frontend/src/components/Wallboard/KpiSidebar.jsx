@@ -1,0 +1,33 @@
+import { FolderOpenOutlined, PlusCircleOutlined, CheckCircleOutlined, WarningOutlined } from '@ant-design/icons';
+
+const items = [
+  { key: 'open', label: 'Tickets abertos', icon: FolderOpenOutlined, hero: true },
+  { key: 'createdToday', label: 'Criados hoje', icon: PlusCircleOutlined },
+  { key: 'closedToday', label: 'Fechados hoje', icon: CheckCircleOutlined },
+  { key: 'slaAtRisk', label: 'SLA em risco', icon: WarningOutlined, alertWhenPositive: true },
+];
+
+export default function KpiSidebar({ totals }) {
+  return (
+    <div className="kpi-sidebar">
+      {items.map((item) => {
+        const value = totals ? totals[item.key] ?? 0 : null;
+        const alert = item.alertWhenPositive && value > 0;
+        return (
+          <div
+            key={item.key}
+            className={`kpi-tile ${item.hero ? 'kpi-tile-hero' : ''} ${alert ? 'kpi-tile-alert' : ''}`}
+          >
+            <span className="kpi-tile-icon">
+              <item.icon />
+            </span>
+            <span className="kpi-tile-text">
+              <span className="kpi-tile-label">{item.label}</span>
+              <span className="kpi-tile-value">{value ?? '—'}</span>
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}

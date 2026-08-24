@@ -29,7 +29,7 @@ function CustomTooltip({ active, payload }) {
   );
 }
 
-export default function StateDonutChart({ byState, dark = false, interactive = true }) {
+export default function StateDonutChart({ byState, dark = false, interactive = true, height = 280 }) {
   const navigate = useNavigate();
   const { categorical, ink } = getPalette(dark);
   const data = prepareData(byState);
@@ -44,7 +44,7 @@ export default function StateDonutChart({ byState, dark = false, interactive = t
       title="Distribuição por estado"
       subtitle={interactive ? 'Clica numa fatia para ver os tickets' : undefined}
     >
-      <ResponsiveContainer width="100%" height={280}>
+      <ResponsiveContainer width="100%" height={height}>
         <PieChart>
           <Pie
             data={data}
