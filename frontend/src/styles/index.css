@@ -1231,10 +1231,20 @@ input:focus {
   height: 100vh;
   overflow: hidden;
   padding: 22px 30px;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.wallboard-content {
+  height: 100%;
   display: flex;
   flex-direction: column;
   gap: 18px;
-  box-sizing: border-box;
+  transition: filter 0.5s ease;
+}
+
+.wallboard-dimmed {
+  filter: blur(12px) brightness(0.4);
 }
 
 .wallboard-header {
@@ -1447,18 +1457,6 @@ input:focus {
 
 /* ---------- Ticket lists (wallboard): filas / sem resposta ---------- */
 
-.wallboard-lists-row {
-  display: flex;
-  gap: 16px;
-  min-width: 0;
-  min-height: 0;
-}
-
-.wallboard-lists-row .chart-card {
-  flex: 1;
-  min-width: 0;
-}
-
 .stale-list {
   display: flex;
   flex-direction: column;
@@ -1469,16 +1467,16 @@ input:focus {
 
 .stale-row {
   display: grid;
-  grid-template-columns: 44px 1fr 100px 46px;
+  grid-template-columns: 56px 1fr 160px 60px;
   align-items: center;
-  gap: 10px;
-  padding: 6px 0;
+  gap: 14px;
+  padding: 7px 0;
   border-bottom: 1px solid var(--border);
-  font-size: 13px;
+  font-size: 13.5px;
 }
 
 .stale-row-compact {
-  grid-template-columns: 44px 1fr 46px;
+  grid-template-columns: 56px 1fr 60px;
 }
 
 .stale-row:last-child {
@@ -1541,4 +1539,111 @@ input:focus {
     flex-direction: row;
     flex-basis: auto;
   }
+}
+
+/* ---------- Coffee break overlay ---------- */
+
+.coffee-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(12, 12, 13, 0.55);
+  animation: coffee-fade-in 0.4s ease;
+}
+
+@keyframes coffee-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.coffee-card {
+  background: #1f1a17;
+  border: 1px solid rgba(235, 104, 52, 0.35);
+  border-radius: 24px;
+  padding: 44px 56px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
+  animation: coffee-pop-in 0.45s cubic-bezier(0.2, 0.8, 0.3, 1.2);
+}
+
+@keyframes coffee-pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.85) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.coffee-card h2 {
+  font-size: 26px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-top: 6px;
+}
+
+.coffee-card p {
+  font-size: 15px;
+  color: #c9c3ba;
+}
+
+.coffee-steam path {
+  animation: coffee-steam-rise 2.4s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+.coffee-steam path:nth-child(2) {
+  animation-delay: 0.3s;
+}
+
+.coffee-steam path:nth-child(3) {
+  animation-delay: 0.6s;
+}
+
+@keyframes coffee-steam-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  40% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+.coffee-close {
+  position: fixed;
+  top: 28px;
+  right: 32px;
+  z-index: 1000;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.15s ease;
+}
+
+.coffee-close:hover {
+  background: rgba(255, 255, 255, 0.18);
 }

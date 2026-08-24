@@ -4,12 +4,14 @@ import { Link } from 'react-router-dom';
 import { LogoutOutlined, SettingOutlined } from '@ant-design/icons';
 import { useAuthProfile } from '../auth/AuthContext';
 import { useAutoRefresh } from '../hooks/useAutoRefresh';
+import { useCoffeeBreak } from '../hooks/useCoffeeBreak';
 import { getOverview, getTimeseries, getWallboardSettings } from '../api/endpoints';
 import { periodToDays } from '../utils/period';
 // import BrandMark from '../components/Common/BrandMark';
 import KpiSidebar from '../components/Wallboard/KpiSidebar';
 import StaleTicketsList from '../components/Wallboard/StaleTicketsList';
 import UnassignedQueueList from '../components/Wallboard/UnassignedQueueList';
+import CoffeeBreakOverlay from '../components/Wallboard/CoffeeBreakOverlay';
 import TimeSeriesChart from '../components/Charts/TimeSeriesChart';
 import StateDonutChart from '../components/Charts/StateDonutChart';
 import GroupBarChart from '../components/Charts/GroupBarChart';
@@ -35,6 +37,7 @@ export default function Wallboard() {
   const now = useClock();
   const { instance } = useMsal();
   const { profile, isAdmin } = useAuthProfile();
+  const coffeeBreak = useCoffeeBreak();
 
   const settings = useAutoRefresh(getWallboardSettings, [], SETTINGS_REFRESH_SECONDS);
   const widgets = settings.data?.widgets;
@@ -56,88 +59,88 @@ export default function Wallboard() {
   const showByAssignee = !widgets || widgets.chartByAssignee;
   const showStaleTickets = !widgets || widgets.chartStaleTickets;
   const showUnassignedQueue = !widgets || widgets.chartUnassignedQueue;
-  const showListsRow = showStaleTickets || showUnassignedQueue;
-  const anyChartVisible = showTimeseries || showByState || showByGroup || showByAssignee || showListsRow;
+  const anyChartVisible =
+    showTimeseries || showByState || showByGroup || showByAssignee || showStaleTickets || showUnassignedQueue;
 
   return (
     <div className="wallboard-page dark-theme">
-      <header className="wallboard-header">
-        <div className="wallboard-brand">
-          <img src={logo} alt='ICON' />
-          <h1>PKF Helpdesk</h1>
-        </div>
-
-        <div className="wallboard-header-right">
-          <ConnectionStatus />
-          <div className="wallboard-clock">
-            <span className="wallboard-time">{now.toLocaleTimeString('pt-PT')}</span>
-            <span className="wallboard-date">
-              {now.toLocaleDateString('pt-PT', { weekday: 'long', day: '2-digit', month: 'long' })}
-            </span>
+      <div className={`wallboard-content ${coffeeBreak.visible ? 'wallboard-dimmed' : ''}`}>
+        <header className="wallboard-header">
+          <div className="wallboard-brand">
+            <img src={logo} alt="ICON" />
+            <h1>PKF Helpdesk</h1>
           </div>
-          {isAdmin && (
-            <Link to="/backoffice" className="wallboard-logout" title="Backoffice">
-              <SettingOutlined />
-            </Link>
-          )}
-          <button
-            type="button"
-            className="wallboard-logout"
-            onClick={() => instance.logoutRedirect()}
-            title={profile ? `Sair (${profile.email})` : 'Sair'}
-          >
-            <LogoutOutlined />
-          </button>
-        </div>
-      </header>
 
-      {(overview.error || timeseries.error) && (
-        <ErrorBanner message={overview.error || timeseries.error} onRetry={overview.refresh} />
-      )}
-
-      {loading ? (
-        <LoadingSpinner label="A carregar estatísticas…" />
-      ) : (
-        <div className="wallboard-body">
-          {anyChartVisible && (
-            <div className="wallboard-charts">
-              {showTimeseries && (
-                <TimeSeriesChart
-                  data={timeseries.data}
-                  dark
-                  subtitle={`Últimos ${days} dia${days === 1 ? '' : 's'}`}
-                  height="100%"
-                />
-              )}
-              {showByState && (
-                <StateDonutChart byState={overview.data?.byState} dark interactive={false} height="100%" />
-              )}
-              {showByGroup && (
-                <GroupBarChart
-                  byGroup={overview.data?.byGroup}
-                  dark
-                  interactive={false}
-                  height="100%"
-                  limit={6}
-                />
-              )}
-              {showByAssignee && (
-                <AssigneeRanking byAssignee={overview.data?.byAssignee} interactive={false} limit={6} />
-              )}
-              {showListsRow && (
-                <div className="wallboard-lists-row">
-                  {showUnassignedQueue && (
-                    <UnassignedQueueList tickets={overview.data?.unassignedTickets} limit={6} />
-                  )}
-                  {showStaleTickets && <StaleTicketsList tickets={overview.data?.staleTickets} limit={6} />}
-                </div>
-              )}
+          <div className="wallboard-header-right">
+            <ConnectionStatus />
+            <div className="wallboard-clock">
+              <span className="wallboard-time">{now.toLocaleTimeString('pt-PT')}</span>
+              <span className="wallboard-date">
+                {now.toLocaleDateString('pt-PT', { weekday: 'long', day: '2-digit', month: 'long' })}
+              </span>
             </div>
-          )}
+            {isAdmin && (
+              <Link to="/backoffice" className="wallboard-logout" title="Backoffice">
+                <SettingOutlined />
+              </Link>
+            )}
+            <button
+              type="button"
+              className="wallboard-logout"
+              onClick={() => instance.logoutRedirect()}
+              title={profile ? `Sair (${profile.email})` : 'Sair'}
+            >
+              <LogoutOutlined />
+            </button>
+          </div>
+        </header>
 
-          {showAnyKpi && <KpiSidebar totals={overview.data?.totals} widgets={widgets} />}
-        </div>
-      )}
+        {(overview.error || timeseries.error) && (
+          <ErrorBanner message={overview.error || timeseries.error} onRetry={overview.refresh} />
+        )}
+
+        {loading ? (
+          <LoadingSpinner label="A carregar estatísticas…" />
+        ) : (
+          <div className="wallboard-body">
+            {anyChartVisible && (
+              <div className="wallboard-charts">
+                {showTimeseries && (
+                  <TimeSeriesChart
+                    data={timeseries.data}
+                    dark
+                    subtitle={`Últimos ${days} dia${days === 1 ? '' : 's'}`}
+                    height="100%"
+                  />
+                )}
+                {showByState && (
+                  <StateDonutChart byState={overview.data?.byState} dark interactive={false} height="100%" />
+                )}
+                {showUnassignedQueue && (
+                  <UnassignedQueueList tickets={overview.data?.unassignedTickets} limit={6} />
+                )}
+                {showStaleTickets && <StaleTicketsList tickets={overview.data?.staleTickets} limit={6} />}
+                {showByGroup && (
+                  <GroupBarChart
+                    byGroup={overview.data?.byGroup}
+                    dark
+                    interactive={false}
+                    height="100%"
+                    limit={6}
+                  />
+                )}
+                {showByAssignee && (
+                  <AssigneeRanking byAssignee={overview.data?.byAssignee} interactive={false} limit={6} />
+                )}
+              </div>
+            )}
+
+            {showAnyKpi && <KpiSidebar totals={overview.data?.totals} widgets={widgets} />}
+          </div>
+        )}
+      </div>
+
+      {coffeeBreak.visible && <CoffeeBreakOverlay onClose={coffeeBreak.dismiss} />}
     </div>
   );
 }
