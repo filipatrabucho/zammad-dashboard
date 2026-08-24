@@ -377,54 +377,128 @@ input:focus {
 
 /* ---------- Backoffice ---------- */
 
+.backoffice-page {
+  min-height: 100vh;
+  padding: 28px 40px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  box-sizing: border-box;
+}
+
+.backoffice-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.backoffice-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.backoffice-brand h1 {
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.backoffice-header-subtitle {
+  display: block;
+  font-size: 12.5px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.backoffice-body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 980px;
+}
+
 .backoffice-section {
   background: var(--surface-raised);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 20px 24px;
+  padding: 22px 26px;
   box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
-.backoffice-section h2 {
-  font-size: 15px;
+.backoffice-section-heading h2 {
+  font-size: 14px;
   font-weight: 600;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .backoffice-hint {
   font-size: 13px;
   color: var(--text-muted);
-  margin-top: -8px;
+  margin-top: 4px;
 }
 
 .backoffice-toggle-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 10px 20px;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 14px 24px;
 }
 
 .backoffice-toggle {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   font-size: 14px;
   color: var(--text-primary);
   cursor: pointer;
 }
 
 .backoffice-toggle input {
-  width: 16px;
-  height: 16px;
-  accent-color: var(--brand);
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  flex-shrink: 0;
+  width: 38px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--border-strong);
   cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.backoffice-toggle input::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ffffff;
+  transition: transform 0.15s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.backoffice-toggle input:checked {
+  background: var(--brand);
+}
+
+.backoffice-toggle input:checked::before {
+  transform: translateX(16px);
 }
 
 .backoffice-actions {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
 }
 
 .backoffice-saved {
@@ -432,7 +506,7 @@ input:focus {
   align-items: center;
   gap: 6px;
   font-size: 13px;
-  color: var(--good, #0ca30c);
+  color: #6fcf6f;
 }
 
 .refresh-control {
@@ -1129,11 +1203,10 @@ input:focus {
 }
 
 /* ==========================================================
-   Wallboard — ecrã fixo da Sala IT (tema escuro, sem scroll,
-   sem interação — pensado para ficar sempre visível numa TV)
+   Tema escuro partilhado — Wallboard (Sala IT) e Backoffice
    ========================================================== */
 
-.wallboard-page {
+.dark-theme {
   --page-bg: #0c0c0d;
   --surface: #17181a;
   --surface-raised: #17181a;
@@ -1148,10 +1221,15 @@ input:focus {
   --shadow-sm: none;
   --shadow-md: 0 10px 28px rgba(0, 0, 0, 0.5);
 
-  height: 100vh;
-  overflow: hidden;
   background: var(--page-bg);
   color: var(--text-primary);
+}
+
+/* ----- Wallboard — ecrã fixo da Sala IT (sem scroll, sem interação) ----- */
+
+.wallboard-page {
+  height: 100vh;
+  overflow: hidden;
   padding: 22px 30px;
   display: flex;
   flex-direction: column;

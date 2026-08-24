@@ -54,7 +54,7 @@ export default function Wallboard() {
   const anyChartVisible = showTimeseries || showByState || showByGroup || showByAssignee;
 
   return (
-    <div className="wallboard-page">
+    <div className="wallboard-page dark-theme">
       <header className="wallboard-header">
         <div className="wallboard-brand">
           <BrandMark size={30} />
