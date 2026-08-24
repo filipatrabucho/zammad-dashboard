@@ -1,6 +1,6 @@
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useNavigate } from 'react-router-dom';
-import { categorical, ink } from '../../styles/palette';
+import { getPalette } from '../../styles/palette';
 import ChartCard from './ChartCard';
 
 const MAX_SLICES = 7;
@@ -29,17 +29,21 @@ function CustomTooltip({ active, payload }) {
   );
 }
 
-export default function StateDonutChart({ byState }) {
+export default function StateDonutChart({ byState, dark = false, interactive = true }) {
   const navigate = useNavigate();
+  const { categorical, ink } = getPalette(dark);
   const data = prepareData(byState);
 
   const handleClick = (entry) => {
-    if (entry.isOther) return;
+    if (!interactive || entry.isOther) return;
     navigate(`/tickets?state=${encodeURIComponent(entry.name)}`);
   };
 
   return (
-    <ChartCard title="Distribuição por estado" subtitle="Clica numa fatia para ver os tickets">
+    <ChartCard
+      title="Distribuição por estado"
+      subtitle={interactive ? 'Clica numa fatia para ver os tickets' : undefined}
+    >
       <ResponsiveContainer width="100%" height={280}>
         <PieChart>
           <Pie
@@ -50,7 +54,7 @@ export default function StateDonutChart({ byState }) {
             outerRadius={100}
             paddingAngle={2}
             cornerRadius={4}
-            cursor="pointer"
+            cursor={interactive ? 'pointer' : 'default'}
             onClick={handleClick}
           >
             {data.map((entry, index) => (

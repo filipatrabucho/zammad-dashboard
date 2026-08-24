@@ -421,6 +421,20 @@ input:focus {
   border-top-color: #e34948;
 }
 
+.kpi-card.kpi-alert {
+  animation: kpi-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes kpi-pulse {
+  0%,
+  100% {
+    box-shadow: var(--shadow-sm);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(227, 73, 72, 0.25), var(--shadow-md);
+  }
+}
+
 .kpi-label {
   font-size: 13px;
   color: var(--text-secondary);
@@ -1051,5 +1065,213 @@ input:focus {
 
   .ranked-row {
     grid-template-columns: 100px 1fr 32px;
+  }
+}
+
+/* ==========================================================
+   Wallboard — ecrã fixo da Sala IT (tema escuro, sem interação)
+   ========================================================== */
+
+.wallboard-page {
+  --page-bg: #0d0d0d;
+  --surface: #1a1a19;
+  --surface-raised: #1a1a19;
+  --text-primary: #ffffff;
+  --text-secondary: #c3c2b7;
+  --text-muted: #898781;
+  --border: #2c2c2a;
+  --border-strong: #383835;
+  --brand: #3987e5;
+  --brand-hover: #5c9fec;
+  --brand-soft: rgba(57, 135, 229, 0.16);
+  --shadow-sm: none;
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.45);
+
+  min-height: 100vh;
+  background: var(--page-bg);
+  color: var(--text-primary);
+  padding: 28px 36px 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.wallboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.wallboard-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.wallboard-brand h1 {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.wallboard-subtitle {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.wallboard-header-right {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.wallboard-clock {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.wallboard-time {
+  display: block;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.wallboard-date {
+  display: block;
+  font-size: 12px;
+  color: var(--text-muted);
+  text-transform: capitalize;
+}
+
+.wallboard-logout {
+  background: none;
+  border: 1px solid var(--border-strong);
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  opacity: 0.55;
+  transition: opacity 0.15s ease, color 0.15s ease;
+}
+
+.wallboard-logout:hover {
+  opacity: 1;
+  color: var(--text-primary);
+}
+
+.wallboard-body {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.wallboard-page .kpi-grid {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.wallboard-page .kpi-value {
+  font-size: 52px;
+}
+
+.wallboard-page .kpi-label {
+  font-size: 14px;
+}
+
+.wallboard-charts {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.wallboard-page .chart-card-header h3 {
+  font-size: 16px;
+}
+
+.wallboard-page .error-banner {
+  background: rgba(227, 73, 72, 0.12);
+  color: #f0a9a3;
+  border-color: rgba(227, 73, 72, 0.35);
+}
+
+/* ---------- Recent activity feed ---------- */
+
+.recent-feed {
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+}
+
+.recent-feed-header h3 {
+  font-size: 15px;
+  margin-bottom: 14px;
+}
+
+.recent-feed-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.recent-feed-row {
+  display: grid;
+  grid-template-columns: 110px 1fr 160px 60px;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13.5px;
+}
+
+.recent-feed-row:last-child {
+  border-bottom: none;
+}
+
+.recent-feed-title {
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recent-feed-group {
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recent-feed-time {
+  color: var(--text-muted);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 1400px) {
+  .wallboard-charts {
+    grid-template-columns: 1fr;
+  }
+
+  .wallboard-page .kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  .recent-feed-row {
+    grid-template-columns: 90px 1fr;
+  }
+
+  .recent-feed-group,
+  .recent-feed-time {
+    display: none;
+  }
+
+  .wallboard-page .kpi-value {
+    font-size: 36px;
   }
 }

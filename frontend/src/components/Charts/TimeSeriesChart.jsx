@@ -1,5 +1,5 @@
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { categorical, ink } from '../../styles/palette';
+import { getPalette } from '../../styles/palette';
 import ChartCard from './ChartCard';
 
 function formatDate(value) {
@@ -23,9 +23,11 @@ function CustomTooltip({ active, payload, label }) {
   );
 }
 
-export default function TimeSeriesChart({ data }) {
+export default function TimeSeriesChart({ data, dark = false, subtitle = 'Evolução diária no período selecionado' }) {
+  const { categorical, ink } = getPalette(dark);
+
   return (
-    <ChartCard title="Tickets criados vs fechados" subtitle="Evolução diária no período selecionado">
+    <ChartCard title="Tickets criados vs fechados" subtitle={subtitle}>
       <ResponsiveContainer width="100%" height={280}>
         <AreaChart data={data || []} margin={{ top: 8, right: 12, left: -12, bottom: 0 }}>
           <defs>

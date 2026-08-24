@@ -1,9 +1,9 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell, ResponsiveContainer } from 'recharts';
 import { useNavigate } from 'react-router-dom';
-import { sequentialBlue, ink } from '../../styles/palette';
+import { getPalette } from '../../styles/palette';
 import ChartCard from './ChartCard';
 
-function CustomTooltip({ active, payload, label }) {
+function CustomTooltip({ active, payload, label, sequentialBlue }) {
   if (!active || !payload?.length) return null;
   return (
     <div className="chart-tooltip">
@@ -17,12 +17,13 @@ function CustomTooltip({ active, payload, label }) {
   );
 }
 
-export default function GroupBarChart({ byGroup }) {
+export default function GroupBarChart({ byGroup, dark = false, interactive = true }) {
   const navigate = useNavigate();
+  const { ink, sequentialBlue } = getPalette(dark);
   const data = (byGroup || []).slice(0, 10).map((g) => ({ name: g.group, value: g.count }));
 
   return (
-    <ChartCard title="Tickets por grupo" subtitle="Clica numa barra para ver os tickets">
+    <ChartCard title="Tickets por grupo" subtitle={interactive ? 'Clica numa barra para ver os tickets' : undefined}>
       <ResponsiveContainer width="100%" height={280}>
         <BarChart data={data} layout="vertical" margin={{ top: 8, right: 16, left: 8, bottom: 0 }}>
           <CartesianGrid horizontal={false} stroke={ink.gridline} />
@@ -35,12 +36,15 @@ export default function GroupBarChart({ byGroup }) {
             axisLine={false}
             tickLine={false}
           />
-          <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(0,0,0,0.03)' }} />
+          <Tooltip
+            content={<CustomTooltip sequentialBlue={sequentialBlue} />}
+            cursor={{ fill: dark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.03)' }}
+          />
           <Bar
             dataKey="value"
             radius={[0, 4, 4, 0]}
-            cursor="pointer"
-            onClick={(entry) => navigate(`/tickets?group=${encodeURIComponent(entry.name)}`)}
+            cursor={interactive ? 'pointer' : 'default'}
+            onClick={interactive ? (entry) => navigate(`/tickets?group=${encodeURIComponent(entry.name)}`) : undefined}
             maxBarSize={22}
           >
             {data.map((entry) => (
