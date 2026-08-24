@@ -15,7 +15,6 @@ const WIDGET_GROUPS = [
       { key: 'kpiCreatedToday', label: 'Criados hoje' },
       { key: 'kpiClosedToday', label: 'Fechados hoje' },
       { key: 'kpiSlaAtRisk', label: 'SLA em risco' },
-      { key: 'kpiUnassignedQueue', label: 'Fila sem atribuição' },
     ],
   },
   {
@@ -25,6 +24,7 @@ const WIDGET_GROUPS = [
       { key: 'chartByState', label: 'Distribuição por estado' },
       { key: 'chartByGroup', label: 'Tickets por grupo' },
       { key: 'chartByAssignee', label: 'Tickets por assignee' },
+      { key: 'chartUnassignedQueue', label: 'Fila sem atribuição' },
       { key: 'chartStaleTickets', label: 'Sem resposta há mais tempo' },
     ],
   },

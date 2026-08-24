@@ -9,6 +9,7 @@ import { periodToDays } from '../utils/period';
 // import BrandMark from '../components/Common/BrandMark';
 import KpiSidebar from '../components/Wallboard/KpiSidebar';
 import StaleTicketsList from '../components/Wallboard/StaleTicketsList';
+import UnassignedQueueList from '../components/Wallboard/UnassignedQueueList';
 import TimeSeriesChart from '../components/Charts/TimeSeriesChart';
 import StateDonutChart from '../components/Charts/StateDonutChart';
 import GroupBarChart from '../components/Charts/GroupBarChart';
@@ -54,7 +55,9 @@ export default function Wallboard() {
   const showByGroup = !widgets || widgets.chartByGroup;
   const showByAssignee = !widgets || widgets.chartByAssignee;
   const showStaleTickets = !widgets || widgets.chartStaleTickets;
-  const anyChartVisible = showTimeseries || showByState || showByGroup || showByAssignee || showStaleTickets;
+  const showUnassignedQueue = !widgets || widgets.chartUnassignedQueue;
+  const showListsRow = showStaleTickets || showUnassignedQueue;
+  const anyChartVisible = showTimeseries || showByState || showByGroup || showByAssignee || showListsRow;
 
   return (
     <div className="wallboard-page dark-theme">
@@ -121,7 +124,14 @@ export default function Wallboard() {
               {showByAssignee && (
                 <AssigneeRanking byAssignee={overview.data?.byAssignee} interactive={false} limit={6} />
               )}
-              {showStaleTickets && <StaleTicketsList tickets={overview.data?.staleTickets} limit={6} />}
+              {showListsRow && (
+                <div className="wallboard-lists-row">
+                  {showUnassignedQueue && (
+                    <UnassignedQueueList tickets={overview.data?.unassignedTickets} limit={6} />
+                  )}
+                  {showStaleTickets && <StaleTicketsList tickets={overview.data?.staleTickets} limit={6} />}
+                </div>
+              )}
             </div>
           )}
 

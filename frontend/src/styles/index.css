@@ -1445,7 +1445,19 @@ input:focus {
   color: #d98884;
 }
 
-/* ---------- Stale tickets list (wallboard) ---------- */
+/* ---------- Ticket lists (wallboard): filas / sem resposta ---------- */
+
+.wallboard-lists-row {
+  display: flex;
+  gap: 16px;
+  min-width: 0;
+  min-height: 0;
+}
+
+.wallboard-lists-row .chart-card {
+  flex: 1;
+  min-width: 0;
+}
 
 .stale-list {
   display: flex;
@@ -1457,16 +1469,26 @@ input:focus {
 
 .stale-row {
   display: grid;
-  grid-template-columns: 1fr 140px 56px;
+  grid-template-columns: 44px 1fr 100px 46px;
   align-items: center;
-  gap: 14px;
+  gap: 10px;
   padding: 6px 0;
   border-bottom: 1px solid var(--border);
   font-size: 13px;
 }
 
+.stale-row-compact {
+  grid-template-columns: 44px 1fr 46px;
+}
+
 .stale-row:last-child {
   border-bottom: none;
+}
+
+.stale-number {
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
 }
 
 .stale-title {
