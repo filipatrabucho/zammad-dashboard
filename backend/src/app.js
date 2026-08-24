@@ -18,6 +18,7 @@ const usersRoutes = require('./routes/users');
 const statsRoutes = require('./routes/stats');
 const logsRoutes = require('./routes/logs');
 const healthRoutes = require('./routes/health');
+const settingsRoutes = require('./routes/settings');
 
 const app = express();
 
@@ -55,6 +56,7 @@ api.use('/states', authenticate, authorize, statesRoutes);
 api.use('/users', authenticate, authorize, usersRoutes);
 api.use('/stats', authenticate, authorize, statsRoutes);
 api.use('/health', authenticate, authorize, healthRoutes);
+api.use('/settings', authenticate, authorize, settingsRoutes);
 
 // Logs de containers — apenas admins
 api.use('/logs', authenticate, authorize, adminOnly, logsRoutes);
