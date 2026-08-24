@@ -4,7 +4,7 @@ import { LogoutOutlined } from '@ant-design/icons';
 import { useAuthProfile } from '../auth/AuthContext';
 import { useAutoRefresh } from '../hooks/useAutoRefresh';
 import { getOverview, getTimeseries } from '../api/endpoints';
-import BrandMark from '../components/Common/BrandMark';
+// import BrandMark from '../components/Common/BrandMark';
 import KpiSidebar from '../components/Wallboard/KpiSidebar';
 import TimeSeriesChart from '../components/Charts/TimeSeriesChart';
 import StateDonutChart from '../components/Charts/StateDonutChart';
@@ -13,6 +13,7 @@ import AssigneeRanking from '../components/Charts/AssigneeRanking';
 import ConnectionStatus from '../components/Common/ConnectionStatus';
 import LoadingSpinner from '../components/Common/LoadingSpinner';
 import ErrorBanner from '../components/Common/ErrorBanner';
+import logo from '/favicon.svg';
 
 const PERIOD_DAYS = 30;
 const REFRESH_SECONDS = 30;
@@ -43,7 +44,7 @@ export default function Wallboard() {
     <div className="wallboard-page">
       <header className="wallboard-header">
         <div className="wallboard-brand">
-          <BrandMark size={30} />
+          <img src={logo} alt='ICON' />
           <h1>PKF Helpdesk</h1>
         </div>
 
