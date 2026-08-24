@@ -23,6 +23,10 @@ const DEFAULT_SETTINGS = {
     chartStaleTickets: true,
     chartUnassignedQueue: true,
   },
+  coffeeBreak: {
+    enabled: true,
+    hours: [10, 16],
+  },
 };
 
 const WIDGET_KEYS = Object.keys(DEFAULT_SETTINGS.widgets);
@@ -33,8 +37,16 @@ function readSettings() {
     const parsed = JSON.parse(raw);
     return sanitize(parsed);
   } catch (err) {
-    return { ...DEFAULT_SETTINGS, widgets: { ...DEFAULT_SETTINGS.widgets } };
+    return sanitize({});
   }
+}
+
+function sanitizeHours(input) {
+  if (!Array.isArray(input)) return [...DEFAULT_SETTINGS.coffeeBreak.hours];
+  const hours = input
+    .map((h) => parseInt(h, 10))
+    .filter((h) => Number.isInteger(h) && h >= 0 && h <= 23);
+  return Array.from(new Set(hours)).sort((a, b) => a - b);
 }
 
 function sanitize(input) {
@@ -50,7 +62,13 @@ function sanitize(input) {
     });
   }
 
-  return { period, widgets };
+  const coffeeSource = source.coffeeBreak && typeof source.coffeeBreak === 'object' ? source.coffeeBreak : {};
+  const coffeeBreak = {
+    enabled: typeof coffeeSource.enabled === 'boolean' ? coffeeSource.enabled : DEFAULT_SETTINGS.coffeeBreak.enabled,
+    hours: sanitizeHours(coffeeSource.hours),
+  };
+
+  return { period, widgets, coffeeBreak };
 }
 
 function writeSettings(input) {

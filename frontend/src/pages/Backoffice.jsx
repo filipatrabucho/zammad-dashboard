@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeftOutlined, CheckCircleFilled } from '@ant-design/icons';
+import { ArrowLeftOutlined, CheckCircleFilled, CloseOutlined } from '@ant-design/icons';
 import { getWallboardSettings, updateWallboardSettings } from '../api/endpoints';
 import { PERIOD_OPTIONS } from '../utils/period';
 import BrandMark from '../components/Common/BrandMark';
@@ -36,6 +36,7 @@ export default function Backoffice() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
   const [saved, setSaved] = useState(false);
+  const [newHour, setNewHour] = useState(10);
 
   useEffect(() => {
     getWallboardSettings()
@@ -51,6 +52,27 @@ export default function Backoffice() {
 
   const toggleWidget = (key) => {
     setSettings((s) => ({ ...s, widgets: { ...s.widgets, [key]: !s.widgets[key] } }));
+    setSaved(false);
+  };
+
+  const toggleCoffeeEnabled = () => {
+    setSettings((s) => ({ ...s, coffeeBreak: { ...s.coffeeBreak, enabled: !s.coffeeBreak.enabled } }));
+    setSaved(false);
+  };
+
+  const addCoffeeHour = () => {
+    setSettings((s) => {
+      const hours = Array.from(new Set([...s.coffeeBreak.hours, Number(newHour)])).sort((a, b) => a - b);
+      return { ...s, coffeeBreak: { ...s.coffeeBreak, hours } };
+    });
+    setSaved(false);
+  };
+
+  const removeCoffeeHour = (hour) => {
+    setSettings((s) => ({
+      ...s,
+      coffeeBreak: { ...s.coffeeBreak, hours: s.coffeeBreak.hours.filter((h) => h !== hour) },
+    }));
     setSaved(false);
   };
 
@@ -128,6 +150,48 @@ export default function Backoffice() {
                 </div>
               </section>
             ))}
+
+            <section className="backoffice-section">
+              <div className="backoffice-section-heading">
+                <h2>Pausa para café</h2>
+                <p className="backoffice-hint">
+                  A que horas o wallboard toca um aviso e mostra o ecrã de pausa. Usa o botão ▶ no wallboard
+                  (só visível a admins) para testar sem esperar pela hora.
+                </p>
+              </div>
+
+              <label className="backoffice-toggle">
+                <input type="checkbox" checked={settings.coffeeBreak.enabled} onChange={toggleCoffeeEnabled} />
+                <span>Ativar pausas para café</span>
+              </label>
+
+              <div className="coffee-hours-list">
+                {settings.coffeeBreak.hours.length === 0 && (
+                  <span className="backoffice-hint">Nenhuma hora definida.</span>
+                )}
+                {settings.coffeeBreak.hours.map((h) => (
+                  <span key={h} className="coffee-hour-chip">
+                    {String(h).padStart(2, '0')}:00
+                    <button type="button" onClick={() => removeCoffeeHour(h)} aria-label={`Remover ${h}:00`}>
+                      <CloseOutlined />
+                    </button>
+                  </span>
+                ))}
+              </div>
+
+              <div className="coffee-hour-add">
+                <select value={newHour} onChange={(e) => setNewHour(e.target.value)}>
+                  {Array.from({ length: 24 }, (_, h) => (
+                    <option key={h} value={h}>
+                      {String(h).padStart(2, '0')}:00
+                    </option>
+                  ))}
+                </select>
+                <button type="button" className="btn-secondary" onClick={addCoffeeHour}>
+                  Adicionar hora
+                </button>
+              </div>
+            </section>
 
             <div className="backoffice-actions">
               <button type="button" className="btn-primary" onClick={handleSave} disabled={saving}>

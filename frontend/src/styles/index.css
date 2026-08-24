@@ -509,6 +509,57 @@ input:focus {
   color: #6fcf6f;
 }
 
+.coffee-hours-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.coffee-hour-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(235, 104, 52, 0.14);
+  border: 1px solid rgba(235, 104, 52, 0.35);
+  color: var(--text-primary);
+  border-radius: 999px;
+  padding: 5px 8px 5px 14px;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.coffee-hour-chip button {
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  color: var(--text-secondary);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  font-size: 10px;
+}
+
+.coffee-hour-chip button:hover {
+  background: rgba(255, 255, 255, 0.18);
+  color: var(--text-primary);
+}
+
+.coffee-hour-add {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.coffee-hour-add select {
+  background: var(--surface-raised);
+  border: 1px solid var(--border-strong);
+  color: var(--text-primary);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+}
+
 .refresh-control {
   display: flex;
   align-items: center;

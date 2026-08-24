@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useMsal } from '@azure/msal-react';
 import { Link } from 'react-router-dom';
-import { LogoutOutlined, SettingOutlined } from '@ant-design/icons';
+import { LogoutOutlined, SettingOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import { useAuthProfile } from '../auth/AuthContext';
 import { useAutoRefresh } from '../hooks/useAutoRefresh';
 import { useCoffeeBreak } from '../hooks/useCoffeeBreak';
@@ -37,11 +37,11 @@ export default function Wallboard() {
   const now = useClock();
   const { instance } = useMsal();
   const { profile, isAdmin } = useAuthProfile();
-  const coffeeBreak = useCoffeeBreak();
 
   const settings = useAutoRefresh(getWallboardSettings, [], SETTINGS_REFRESH_SECONDS);
   const widgets = settings.data?.widgets;
   const days = periodToDays(settings.data?.period);
+  const coffeeBreak = useCoffeeBreak(settings.data?.coffeeBreak);
 
   const fetchOverview = useCallback(() => getOverview(days), [days]);
   const fetchTimeseries = useCallback(() => getTimeseries(days), [days]);
@@ -79,6 +79,16 @@ export default function Wallboard() {
                 {now.toLocaleDateString('pt-PT', { weekday: 'long', day: '2-digit', month: 'long' })}
               </span>
             </div>
+            {isAdmin && (
+              <button
+                type="button"
+                className="wallboard-logout"
+                onClick={coffeeBreak.triggerNow}
+                title="Testar pausa para café agora"
+              >
+                <PlayCircleOutlined />
+              </button>
+            )}
             {isAdmin && (
               <Link to="/backoffice" className="wallboard-logout" title="Backoffice">
                 <SettingOutlined />
