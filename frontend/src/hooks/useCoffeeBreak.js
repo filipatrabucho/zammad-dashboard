@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { playChime } from '../utils/chime';
 
-const AUTO_DISMISS_MS = 20000;
+const AUTO_DISMISS_MS = 60000; // desaparece sozinho ao fim de 1 min (fechar à mão continua disponível)
 const CHECK_INTERVAL_MS = 15000;
 
 /**
