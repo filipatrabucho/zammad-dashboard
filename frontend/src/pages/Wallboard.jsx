@@ -5,6 +5,7 @@ import { LogoutOutlined, SettingOutlined, PlayCircleOutlined } from '@ant-design
 import { useAuthProfile } from '../auth/AuthContext';
 import { useAutoRefresh } from '../hooks/useAutoRefresh';
 import { useCoffeeBreak } from '../hooks/useCoffeeBreak';
+import { useNewTicketSound } from '../hooks/useNewTicketSound';
 import { getOverview, getTimeseries, getWallboardSettings } from '../api/endpoints';
 import { periodToDays } from '../utils/period';
 // import BrandMark from '../components/Common/BrandMark';
@@ -41,7 +42,9 @@ export default function Wallboard() {
   const settings = useAutoRefresh(getWallboardSettings, [], SETTINGS_REFRESH_SECONDS);
   const widgets = settings.data?.widgets;
   const days = periodToDays(settings.data?.period);
+  const isDark = (settings.data?.theme ?? 'dark') === 'dark';
   const coffeeBreak = useCoffeeBreak(settings.data?.coffeeBreak);
+  useNewTicketSound({ enabled: settings.data?.newTicketSound !== false });
 
   const fetchOverview = useCallback(() => getOverview(days), [days]);
   const fetchTimeseries = useCallback(() => getTimeseries(days), [days]);
@@ -63,7 +66,7 @@ export default function Wallboard() {
     showTimeseries || showByState || showByGroup || showByAssignee || showStaleTickets || showUnassignedQueue;
 
   return (
-    <div className="wallboard-page dark-theme">
+    <div className={`wallboard-page ${isDark ? 'dark-theme' : ''}`}>
       <div className={`wallboard-content ${coffeeBreak.visible ? 'wallboard-dimmed' : ''}`}>
         <header className="wallboard-header">
           <div className="wallboard-brand">
@@ -118,13 +121,13 @@ export default function Wallboard() {
                 {showTimeseries && (
                   <TimeSeriesChart
                     data={timeseries.data}
-                    dark
+                    dark={isDark}
                     subtitle={`Últimos ${days} dia${days === 1 ? '' : 's'}`}
                     height="100%"
                   />
                 )}
                 {showByState && (
-                  <StateDonutChart byState={overview.data?.byState} dark interactive={false} height="100%" />
+                  <StateDonutChart byState={overview.data?.byState} dark={isDark} interactive={false} height="100%" />
                 )}
                 {showUnassignedQueue && (
                   <UnassignedQueueList tickets={overview.data?.unassignedTickets} limit={6} />
@@ -133,7 +136,7 @@ export default function Wallboard() {
                 {showByGroup && (
                   <GroupBarChart
                     byGroup={overview.data?.byGroup}
-                    dark
+                    dark={isDark}
                     interactive={false}
                     height="100%"
                     limit={6}

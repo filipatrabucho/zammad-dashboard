@@ -7,6 +7,11 @@ import BrandMark from '../components/Common/BrandMark';
 import LoadingSpinner from '../components/Common/LoadingSpinner';
 import ErrorBanner from '../components/Common/ErrorBanner';
 
+const THEME_OPTIONS = [
+  { value: 'dark', label: 'Escuro' },
+  { value: 'light', label: 'Claro' },
+];
+
 const WIDGET_GROUPS = [
   {
     title: 'Indicadores',
@@ -47,6 +52,22 @@ export default function Backoffice() {
 
   const setPeriod = (value) => {
     setSettings((s) => ({ ...s, period: value }));
+    setSaved(false);
+  };
+
+  const setTheme = (value) => {
+    setSettings((s) => ({ ...s, theme: value }));
+    setSaved(false);
+  };
+
+  const toggleNewTicketSound = () => {
+    setSettings((s) => ({ ...s, newTicketSound: !s.newTicketSound }));
+    setSaved(false);
+  };
+
+  const setCoffeeDuration = (value) => {
+    const seconds = Math.min(600, Math.max(5, Number(value) || 60));
+    setSettings((s) => ({ ...s, coffeeBreak: { ...s.coffeeBreak, durationSeconds: seconds } }));
     setSaved(false);
   };
 
@@ -112,6 +133,25 @@ export default function Backoffice() {
       ) : (
         settings && (
           <div className="backoffice-body">
+            <section className="backoffice-section">
+              <div className="backoffice-section-heading">
+                <h2>Aparência</h2>
+                <p className="backoffice-hint">Tema visual do ecrã da Sala IT.</p>
+              </div>
+              <div className="segmented">
+                {THEME_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    className={settings.theme === opt.value ? 'active' : ''}
+                    onClick={() => setTheme(opt.value)}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </section>
+
             <section className="backoffice-section">
               <div className="backoffice-section-heading">
                 <h2>Período</h2>
@@ -191,6 +231,34 @@ export default function Backoffice() {
                   Adicionar hora
                 </button>
               </div>
+
+              <label className="backoffice-duration">
+                <span>Duração do ecrã de pausa</span>
+                <div className="backoffice-duration-input">
+                  <input
+                    type="number"
+                    min={5}
+                    max={600}
+                    step={5}
+                    value={settings.coffeeBreak.durationSeconds}
+                    onChange={(e) => setCoffeeDuration(e.target.value)}
+                  />
+                  <span className="backoffice-duration-unit">segundos</span>
+                </div>
+                <span className="backoffice-hint">
+                  ≈ {Math.round((settings.coffeeBreak.durationSeconds / 60) * 10) / 10} min. Entre 5s e 10min.
+                </span>
+              </label>
+            </section>
+
+            <section className="backoffice-section">
+              <div className="backoffice-section-heading">
+                <h2>Notificações</h2>
+              </div>
+              <label className="backoffice-toggle">
+                <input type="checkbox" checked={settings.newTicketSound} onChange={toggleNewTicketSound} />
+                <span>Tocar som quando entra um ticket novo</span>
+              </label>
             </section>
 
             <div className="backoffice-actions">

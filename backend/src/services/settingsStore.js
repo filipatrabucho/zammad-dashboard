@@ -8,9 +8,13 @@ const DATA_DIR = path.join(__dirname, '..', '..', 'data');
 const FILE_PATH = path.join(DATA_DIR, 'wallboard-settings.json');
 
 const VALID_PERIODS = ['day', 'week', 'month'];
+const VALID_THEMES = ['dark', 'light'];
+const MIN_COFFEE_DURATION_S = 5;
+const MAX_COFFEE_DURATION_S = 600;
 
 const DEFAULT_SETTINGS = {
   period: 'month',
+  theme: 'dark',
   widgets: {
     kpiOpen: true,
     kpiCreatedToday: true,
@@ -26,7 +30,9 @@ const DEFAULT_SETTINGS = {
   coffeeBreak: {
     enabled: true,
     hours: [10, 16],
+    durationSeconds: 60,
   },
+  newTicketSound: true,
 };
 
 const WIDGET_KEYS = Object.keys(DEFAULT_SETTINGS.widgets);
@@ -49,9 +55,18 @@ function sanitizeHours(input) {
   return Array.from(new Set(hours)).sort((a, b) => a - b);
 }
 
+function sanitizeDuration(input) {
+  const n = parseInt(input, 10);
+  if (!Number.isInteger(n) || n < MIN_COFFEE_DURATION_S || n > MAX_COFFEE_DURATION_S) {
+    return DEFAULT_SETTINGS.coffeeBreak.durationSeconds;
+  }
+  return n;
+}
+
 function sanitize(input) {
   const source = input && typeof input === 'object' ? input : {};
   const period = VALID_PERIODS.includes(source.period) ? source.period : DEFAULT_SETTINGS.period;
+  const theme = VALID_THEMES.includes(source.theme) ? source.theme : DEFAULT_SETTINGS.theme;
 
   const widgets = { ...DEFAULT_SETTINGS.widgets };
   if (source.widgets && typeof source.widgets === 'object') {
@@ -66,9 +81,13 @@ function sanitize(input) {
   const coffeeBreak = {
     enabled: typeof coffeeSource.enabled === 'boolean' ? coffeeSource.enabled : DEFAULT_SETTINGS.coffeeBreak.enabled,
     hours: sanitizeHours(coffeeSource.hours),
+    durationSeconds: sanitizeDuration(coffeeSource.durationSeconds),
   };
 
-  return { period, widgets, coffeeBreak };
+  const newTicketSound =
+    typeof source.newTicketSound === 'boolean' ? source.newTicketSound : DEFAULT_SETTINGS.newTicketSound;
+
+  return { period, theme, widgets, coffeeBreak, newTicketSound };
 }
 
 function writeSettings(input) {
@@ -78,4 +97,11 @@ function writeSettings(input) {
   return clean;
 }
 
-module.exports = { readSettings, writeSettings, DEFAULT_SETTINGS, VALID_PERIODS, WIDGET_KEYS };
+module.exports = {
+  readSettings,
+  writeSettings,
+  DEFAULT_SETTINGS,
+  VALID_PERIODS,
+  VALID_THEMES,
+  WIDGET_KEYS,
+};

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { playChime } from '../utils/chime';
 
-const AUTO_DISMISS_MS = 60000; // desaparece sozinho ao fim de 1 min (fechar à mão continua disponível)
+const DEFAULT_DURATION_S = 60;
 const CHECK_INTERVAL_MS = 15000;
 
 /**
@@ -10,10 +10,12 @@ const CHECK_INTERVAL_MS = 15000;
  * para não repetir dentro da mesma hora enquanto o separador fica aberto.
  * `triggerNow()` permite simular/testar sem esperar pela hora certa.
  */
-export function useCoffeeBreak({ enabled = true, hours = [] } = {}) {
+export function useCoffeeBreak({ enabled = true, hours = [], durationSeconds = DEFAULT_DURATION_S } = {}) {
   const [visible, setVisible] = useState(false);
   const lastFiredKey = useRef(null);
   const dismissTimer = useRef(null);
+  const durationRef = useRef(durationSeconds);
+  durationRef.current = durationSeconds;
 
   const clearDismissTimer = () => {
     if (dismissTimer.current) {
@@ -26,7 +28,7 @@ export function useCoffeeBreak({ enabled = true, hours = [] } = {}) {
     clearDismissTimer();
     setVisible(true);
     playChime();
-    dismissTimer.current = setTimeout(() => setVisible(false), AUTO_DISMISS_MS);
+    dismissTimer.current = setTimeout(() => setVisible(false), durationRef.current * 1000);
   }, []);
 
   const dismiss = useCallback(() => {
