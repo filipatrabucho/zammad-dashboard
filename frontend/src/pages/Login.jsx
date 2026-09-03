@@ -2,7 +2,6 @@ import { useMsal } from '@azure/msal-react';
 import { loginRequest } from '../auth/authConfig';
 import { msalInitError } from '../auth/msalInstance';
 import ErrorBanner from '../components/Common/ErrorBanner';
-// import BrandMark from '../components/Common/BrandMark';
 import logo from '/favicon.svg';
 
 export default function Login() {

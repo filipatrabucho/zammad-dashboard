@@ -8,8 +8,8 @@ import { useCoffeeBreak } from '../hooks/useCoffeeBreak';
 import { useNewTicketSound } from '../hooks/useNewTicketSound';
 import { getOverview, getTimeseries, getWallboardSettings } from '../api/endpoints';
 import { periodToDays } from '../utils/period';
-// import BrandMark from '../components/Common/BrandMark';
 import KpiSidebar from '../components/Wallboard/KpiSidebar';
+import ServerStatusPanel from '../components/Wallboard/ServerStatusPanel';
 import StaleTicketsList from '../components/Wallboard/StaleTicketsList';
 import UnassignedQueueList from '../components/Wallboard/UnassignedQueueList';
 import CoffeeBreakOverlay from '../components/Wallboard/CoffeeBreakOverlay';
@@ -149,6 +149,7 @@ export default function Wallboard() {
             )}
 
             {showAnyKpi && <KpiSidebar totals={overview.data?.totals} widgets={widgets} />}
+            <ServerStatusPanel />
           </div>
         )}
       </div>

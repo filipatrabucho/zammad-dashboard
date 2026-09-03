@@ -1,20 +1,21 @@
 # Zammad Dashboard
 
-Dashboard interno para monitorizar tickets do [Zammad](https://zammad.org),
-com autenticação via Azure AD (Microsoft Entra ID) e controlo de acesso por
+Wallboard interno ("PKF Helpdesk") para monitorizar tickets do
+[Zammad](https://zammad.org) num ecrã fixo (ex: TV da sala de IT), com
+autenticação via Azure AD (Microsoft Entra ID) e controlo de acesso por
 lista de emails (admin / viewer).
 
 - **Backend**: Node.js + Express, proxy autenticado para a API do Zammad.
-- **Frontend**: React (Vite), com login Microsoft via MSAL, gráficos
-  clicáveis (Recharts) e tabela de tickets com filtros.
+- **Frontend**: React (Vite), com login Microsoft via MSAL. Duas páginas:
+  o **Wallboard** (`/`, ecrã fixo com KPIs e gráficos, sem interação) e o
+  **Backoffice** (`/backoffice`, configuração — só admins).
 - **Autenticação**: o frontend obtém um token do Azure AD (MSAL, Authorization
   Code + PKCE) e envia-o como `Authorization: Bearer <token>` em cada pedido
   à API; o backend valida a assinatura do JWT contra as chaves públicas do
   tenant (`jsonwebtoken` + `jwks-rsa`) — sem sessões/cookies no servidor.
 - **Autorização**: só quem estiver listado em `ALLOWED_ADMINS` ou
   `ALLOWED_VIEWERS` (no `.env` do backend) consegue usar o dashboard.
-  Admins veem tudo, incluindo o separador **Logs**; viewers só veem os
-  dados (Overview, Tickets, Grupos).
+  Admins veem também o **Backoffice**; viewers só veem o Wallboard.
 
 ---
 
@@ -22,8 +23,8 @@ lista de emails (admin / viewer).
 
 ```
 zammad-dashboard/
-├── backend/          # API Express (proxy Zammad, auth, stats, logs)
-├── frontend/          # React (Vite) — UI do dashboard
+├── backend/          # API Express (proxy Zammad, auth, stats, settings)
+├── frontend/          # React (Vite) — Wallboard + Backoffice
 ├── Dockerfile          # build multi-stage (frontend + backend)
 ├── docker-compose.yml
 ├── ecosystem.config.js # alternativa via PM2 (sem Docker)
@@ -38,7 +39,7 @@ do build do React (`frontend/dist`) — um único processo, uma única porta.
 
 - Node.js ≥ 18
 - Uma instância Zammad acessível, com um **token de API** (Perfil → Token de
-  Acesso, com permissões de leitura sobre tickets/grupos/estados/utilizadores)
+  Acesso, com permissões de leitura sobre tickets)
 - Uma **App Registration** no Azure AD (ver secção 4)
 - Docker (opcional, para deploy via container) ou PM2/systemd (opcional)
 
@@ -108,10 +109,9 @@ autenticado ao Azure AD).
 | `AZURE_TENANT_ID` | Tenant ID da App Registration |
 | `AZURE_CLIENT_ID` | Client ID da App Registration |
 | `AZURE_API_AUDIENCE` | Opcional — só necessário se usares um scope de API customizado (ver secção 4) |
-| `ALLOWED_ADMINS` | Emails com acesso total, separados por vírgulas |
-| `ALLOWED_VIEWERS` | Emails com acesso só de leitura, separados por vírgulas |
-| `LOG_CONTAINERS` | Whitelist de nomes de containers visíveis em Logs |
-| `STATS_CACHE_TTL_MS` / `LIST_CACHE_TTL_MS` | TTL da cache em memória |
+| `ALLOWED_ADMINS` | Emails com acesso total (Wallboard + Backoffice), separados por vírgulas |
+| `ALLOWED_VIEWERS` | Emails com acesso só ao Wallboard, separados por vírgulas |
+| `STATS_CACHE_TTL_MS` | TTL da cache de estatísticas em memória |
 | `RATE_LIMIT_WINDOW_MS` / `RATE_LIMIT_MAX` | Rate limiting da API |
 
 ### Frontend (`frontend/.env.local`, a partir de `frontend/.env.example`)
@@ -162,11 +162,7 @@ docker compose up -d --build
 ```
 
 O `Dockerfile` faz build do frontend e corre o backend, que serve tudo numa
-porta só (`4000` por omissão). O `docker-compose.yml` monta o socket do
-Docker do host (só leitura) para a página de **Logs** poder correr
-`docker logs` sobre os containers do Zammad, pelo nome real de cada um
-(ver `LOG_CONTAINERS` na secção 5 — usa `docker ps --format '{{.Names}}'`
-no servidor para os encontrares).
+porta só (`4000` por omissão).
 
 ### Opção B — PM2 (sem Docker)
 
@@ -229,65 +225,20 @@ Bearer <token>` válido e o email do utilizador numa das listas do `.env`.
 | Rota | Descrição | Acesso |
 |---|---|---|
 | `GET /api/auth/me` | Identidade + role do utilizador autenticado | qualquer autenticado autorizado |
-| `GET /api/tickets` | Pesquisa de tickets (query, state, group, assignee, page, perPage) | admin/viewer |
-| `GET /api/tickets/:id` | Detalhe de um ticket | admin/viewer |
-| `GET /api/groups` | Lista de grupos | admin/viewer |
-| `GET /api/states` | Lista de estados possíveis | admin/viewer |
-| `GET /api/users` | Lista de agentes | admin/viewer |
-| `GET /api/stats/overview?days=30` | Agregações (por estado/grupo/assignee, KPIs) | admin/viewer |
+| `GET /api/tickets` | Pesquisa de tickets (query, state, group, assignee, page, perPage) — usado internamente pelo som de "ticket novo" | admin/viewer |
+| `GET /api/stats/overview?days=30` | Agregações (por estado/grupo/assignee, KPIs, fila sem atribuição, tickets parados) | admin/viewer |
 | `GET /api/stats/timeseries?days=30` | Série temporal criados vs fechados | admin/viewer |
-| `GET /api/logs` | Lista de containers permitidos | **admin** |
-| `GET /api/logs/:container?tail=200` | `docker logs` do container | **admin** |
+| `GET /api/settings/wallboard` | Definições atuais do wallboard (tema, período, widgets, pausa para café, som) | admin/viewer |
+| `PUT /api/settings/wallboard` | Atualiza as definições do wallboard | **admin** |
 
 Notas de segurança implementadas:
 
-- `:container` é sempre validado contra a whitelist `LOG_CONTAINERS` — nunca
-  é passado input livre a um comando de shell (usa `execFile`, sem shell).
 - Rate limiting básico em todas as rotas `/api`.
 - CORS restrito à origem configurada em `FRONTEND_ORIGIN`.
-- Cache em memória (TTL configurável) para as rotas de listas/estatísticas,
-  para não sobrecarregar a instância Zammad.
+- Cache em memória (TTL configurável) para as rotas de estatísticas, para
+  não sobrecarregar a instância Zammad.
 - Erros do Zammad (offline, timeout, token inválido) são tratados de forma
   consistente e nunca expõem detalhes internos ao cliente.
-
-### A página de Logs só funciona onde o Docker estiver acessível
-
-`GET /api/logs/:container` corre literalmente `docker logs <container>` no
-processo do backend. Isto só funciona se esse processo tiver acesso ao
-**mesmo Docker daemon** que corre os containers do Zammad:
-
-- Em produção (Docker, secção 7 opção A) isso já está tratado — o
-  `docker-compose.yml` monta `/var/run/docker.sock` no container do
-  dashboard.
-- Se correres o backend localmente com `npm run dev` (ex: no teu portátil,
-  fora do servidor onde o Zammad realmente corre), a página de Logs **não
-  vai funcionar** — vais ver um erro tipo `failed to connect to the docker
-  API at npipe:////./pipe/dockerDesktopLinuxEngine` (Windows) ou `Cannot
-  connect to the Docker daemon` (Linux/Mac), porque não há nenhum Docker
-  local a correr esses containers. Isto é esperado, não é um bug.
-
-**Alternativa sem mudar onde o backend corre**: define `DOCKER_HOST` no
-`backend/.env` a apontar para o Docker do servidor via SSH — o `docker` CLI
-lê essa variável automaticamente (não é preciso nenhuma alteração de
-código):
-
-```bash
-DOCKER_HOST=ssh://utilizador@ip-ou-hostname-do-servidor
-```
-
-Pré-requisitos no servidor Linux:
-1. O utilizador SSH usado consegue autenticar-se **sem password** a partir
-   da máquina onde corre o backend (chave SSH). Testa primeiro no terminal:
-   `ssh utilizador@servidor docker ps` — se isso pedir password ou falhar,
-   o `DOCKER_HOST` também vai falhar.
-2. Esse utilizador consegue correr `docker` no servidor sem `sudo`
-   (normalmente por estar no grupo `docker`: `sudo usermod -aG docker
-   utilizador`, depois nova sessão SSH).
-
-Com isto o dashboard pode continuar a correr onde for mais conveniente em
-desenvolvimento, enquanto os Logs falam com o Docker remoto por SSH. Em
-produção continua a ser preferível correr o backend no mesmo servidor
-(secção 7, opção A) — mais simples e sem dependência de SSH.
 
 ---
 

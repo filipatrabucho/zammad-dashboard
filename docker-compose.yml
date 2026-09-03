@@ -9,10 +9,6 @@ services:
       # Expor apenas na interface interna da rede local (ver item 47 do README).
       # Exemplo: "192.168.1.10:4000:4000" em vez de publicar em todas as interfaces.
       - "4000:4000"
-    volumes:
-      # Necessário para a página de Logs correr `docker logs` sobre os
-      # containers do Zammad a partir de dentro deste container.
-      - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
       - internal
 

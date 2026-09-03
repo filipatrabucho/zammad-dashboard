@@ -68,31 +68,6 @@ async function searchTickets(params = {}) {
   });
 }
 
-async function getTicket(id) {
-  // expand=true (tal como na pesquisa) devolve o ticket "achatado", com
-  // state/group/owner como strings legíveis em vez de *_id numéricos.
-  // As mensagens não vêm incluídas nesse pedido, por isso buscamos os
-  // artigos à parte e juntamos tudo numa única estrutura para o frontend.
-  const [ticket, articles] = await Promise.all([
-    request({ method: 'GET', url: `/tickets/${id}`, params: { expand: true } }),
-    request({ method: 'GET', url: `/ticket_articles/by_ticket/${id}` }).catch(() => []),
-  ]);
-
-  return { ...ticket, articles: Array.isArray(articles) ? articles : [] };
-}
-
-async function listGroups() {
-  return request({ method: 'GET', url: '/groups' });
-}
-
-async function listStates() {
-  return request({ method: 'GET', url: '/ticket_states' });
-}
-
-async function listUsers() {
-  return request({ method: 'GET', url: '/users', params: { per_page: 200 } });
-}
-
 /**
  * Busca um lote de tickets (com expand) para agregações internas de
  * estatísticas. Limitado por `limit` para não sobrecarregar o Zammad —
@@ -127,10 +102,6 @@ async function ping() {
 module.exports = {
   ZammadError,
   searchTickets,
-  getTicket,
-  listGroups,
-  listStates,
-  listUsers,
   fetchTicketsForStats,
   ping,
 };

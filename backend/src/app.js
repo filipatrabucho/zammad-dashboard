@@ -6,17 +6,13 @@ const morgan = require('morgan');
 
 const env = require('./config/env');
 const { authenticate } = require('./middleware/auth');
-const { authorize, adminOnly } = require('./middleware/authorize');
+const { authorize } = require('./middleware/authorize');
 const { apiLimiter } = require('./middleware/rateLimit');
 const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 
 const authRoutes = require('./routes/auth');
 const ticketsRoutes = require('./routes/tickets');
-const groupsRoutes = require('./routes/groups');
-const statesRoutes = require('./routes/states');
-const usersRoutes = require('./routes/users');
 const statsRoutes = require('./routes/stats');
-const logsRoutes = require('./routes/logs');
 const healthRoutes = require('./routes/health');
 const settingsRoutes = require('./routes/settings');
 
@@ -51,15 +47,9 @@ api.use('/auth', authRoutes);
 // A partir daqui, todas as rotas exigem um JWT válido do Azure AD
 // (authenticate) e o email tem de estar numa das listas do .env (authorize).
 api.use('/tickets', authenticate, authorize, ticketsRoutes);
-api.use('/groups', authenticate, authorize, groupsRoutes);
-api.use('/states', authenticate, authorize, statesRoutes);
-api.use('/users', authenticate, authorize, usersRoutes);
 api.use('/stats', authenticate, authorize, statsRoutes);
 api.use('/health', authenticate, authorize, healthRoutes);
 api.use('/settings', authenticate, authorize, settingsRoutes);
-
-// Logs de containers — apenas admins
-api.use('/logs', authenticate, authorize, adminOnly, logsRoutes);
 
 api.use(notFoundHandler);
 api.use(errorHandler);

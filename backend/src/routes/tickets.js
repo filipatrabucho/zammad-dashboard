@@ -27,21 +27,4 @@ router.get('/', async (req, res, next) => {
   }
 });
 
-/**
- * GET /api/tickets/:id
- * Detalhe de um ticket específico.
- */
-router.get('/:id', async (req, res, next) => {
-  try {
-    const id = parseInt(req.params.id, 10);
-    if (!Number.isInteger(id) || id <= 0) {
-      return res.status(400).json({ error: 'ID de ticket inválido.' });
-    }
-    const data = await zammad.getTicket(id);
-    res.json(data);
-  } catch (err) {
-    next(err);
-  }
-});
-
 module.exports = router;
