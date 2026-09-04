@@ -3,6 +3,7 @@ import { AuthenticatedTemplate, UnauthenticatedTemplate } from '@azure/msal-reac
 import ProtectedRoute from './components/Common/ProtectedRoute';
 import Login from './pages/Login';
 import Wallboard from './pages/Wallboard';
+import Insights from './pages/Insights';
 import Backoffice from './pages/Backoffice';
 
 export default function App() {
@@ -21,6 +22,15 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Wallboard />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/insights"
+            element={
+              <ProtectedRoute>
+                <Insights />
               </ProtectedRoute>
             }
           />

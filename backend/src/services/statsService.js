@@ -141,4 +141,43 @@ async function getTimeseries({ days = 30 } = {}) {
   return Array.from(buckets.values());
 }
 
-module.exports = { getOverview, getTimeseries };
+/**
+ * Agregações para a segunda página do wallboard: tickets por
+ * cliente/organização (abertos vs fechados), principais criadores de
+ * tickets, e tickets por categoria — calculadas sobre os tickets criados
+ * no período pedido, tal como o overview principal.
+ */
+async function getSecondaryOverview({ days = 30 } = {}) {
+  const since = new Date();
+  since.setDate(since.getDate() - days);
+  const sinceDate = isoDate(since);
+
+  const periodTickets = await zammad.fetchTicketsForStats({ query: `created_at:>=${sinceDate}`, limit: 1500 });
+
+  const orgCounts = new Map();
+  periodTickets.forEach((t) => {
+    const org = t.organization || 'Sem organização';
+    const entry = orgCounts.get(org) || { organization: org, open: 0, closed: 0 };
+    if (t.close_at || isClosedState(t.state)) entry.closed += 1;
+    else entry.open += 1;
+    orgCounts.set(org, entry);
+  });
+  const byOrganization = Array.from(orgCounts.values()).sort(
+    (a, b) => b.open + b.closed - (a.open + a.closed)
+  );
+
+  const topCreators = countBy(periodTickets, (t) => t.customer).map((x) => ({ customer: x.key, count: x.count }));
+
+  // Campo customizado "category" — assume-se que o Zammad devolve o valor
+  // selecionado diretamente nesta propriedade quando `expand=true`.
+  const byCategory = countBy(periodTickets, (t) => t.category).map((x) => ({ category: x.key, count: x.count }));
+
+  return {
+    period: { days },
+    byOrganization,
+    topCreators,
+    byCategory,
+  };
+}
+
+module.exports = { getOverview, getTimeseries, getSecondaryOverview };

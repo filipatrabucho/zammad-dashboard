@@ -41,4 +41,20 @@ router.get('/timeseries', async (req, res, next) => {
   }
 });
 
+/**
+ * GET /api/stats/secondary?days=30
+ * Agregações para a segunda página do wallboard (clientes/categorias).
+ */
+router.get('/secondary', async (req, res, next) => {
+  try {
+    const days = parseDays(req.query.days);
+    const data = await cache.wrap(`secondary:${days}`, env.statsCacheTtlMs, () =>
+      statsService.getSecondaryOverview({ days })
+    );
+    res.json(data);
+  } catch (err) {
+    next(err);
+  }
+});
+
 module.exports = router;

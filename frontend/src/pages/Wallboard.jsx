@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useMsal } from '@azure/msal-react';
 import { Link } from 'react-router-dom';
-import { LogoutOutlined, SettingOutlined, PlayCircleOutlined } from '@ant-design/icons';
+import { LogoutOutlined, SettingOutlined, PlayCircleOutlined, TeamOutlined } from '@ant-design/icons';
 import { useAuthProfile } from '../auth/AuthContext';
 import { useAutoRefresh } from '../hooks/useAutoRefresh';
 import { useCoffeeBreak } from '../hooks/useCoffeeBreak';
@@ -82,6 +82,9 @@ export default function Wallboard() {
                 {now.toLocaleDateString('pt-PT', { weekday: 'long', day: '2-digit', month: 'long' })}
               </span>
             </div>
+            <Link to="/insights" className="wallboard-logout" title="Clientes & Categorias">
+              <TeamOutlined />
+            </Link>
             {isAdmin && (
               <button
                 type="button"
