@@ -6,7 +6,11 @@ const REFRESH_SECONDS = 30;
 
 function statusLabel(server) {
   if (server.status === 'up') return server.latencyMs != null ? `${server.latencyMs}ms` : 'ok';
-  if (server.status === 'down') return server.statusCode ? `HTTP ${server.statusCode}` : 'em baixo';
+  if (server.status === 'down') {
+    if (server.statusCode) return `HTTP ${server.statusCode}`;
+    if (server.errorReason) return server.errorReason;
+    return 'em baixo';
+  }
   return '—';
 }
 
