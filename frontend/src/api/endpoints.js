@@ -17,3 +17,13 @@ export const getWallboardSettings = () => apiClient.get('/settings/wallboard').t
 
 export const updateWallboardSettings = (payload) =>
   apiClient.put('/settings/wallboard', payload).then((r) => r.data);
+
+export const getServers = () => apiClient.get('/servers').then((r) => r.data);
+
+export const createServer = (payload) => apiClient.post('/servers', payload).then((r) => r.data);
+
+export const updateServer = (id, payload) => apiClient.put(`/servers/${id}`, payload).then((r) => r.data);
+
+export const deleteServer = (id) => apiClient.delete(`/servers/${id}`).then((r) => r.data);
+
+export const getServersStatus = () => apiClient.get('/servers/status').then((r) => r.data);

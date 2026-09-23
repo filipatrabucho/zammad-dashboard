@@ -1,22 +1,26 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useMsal } from '@azure/msal-react';
 import { Link } from 'react-router-dom';
-import { LogoutOutlined, SettingOutlined, PlayCircleOutlined, TeamOutlined } from '@ant-design/icons';
+import { LogoutOutlined, SettingOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import { useAuthProfile } from '../auth/AuthContext';
 import { useAutoRefresh } from '../hooks/useAutoRefresh';
 import { useCoffeeBreak } from '../hooks/useCoffeeBreak';
 import { useNewTicketSound } from '../hooks/useNewTicketSound';
-import { getOverview, getTimeseries, getWallboardSettings } from '../api/endpoints';
+import { getOverview, getSecondaryOverview, getTimeseries, getWallboardSettings } from '../api/endpoints';
 import { periodToDays } from '../utils/period';
 import KpiSidebar from '../components/Wallboard/KpiSidebar';
 import ServerStatusPanel from '../components/Wallboard/ServerStatusPanel';
 import StaleTicketsList from '../components/Wallboard/StaleTicketsList';
 import UnassignedQueueList from '../components/Wallboard/UnassignedQueueList';
 import CoffeeBreakOverlay from '../components/Wallboard/CoffeeBreakOverlay';
+import WallboardCarousel from '../components/Wallboard/WallboardCarousel';
 import TimeSeriesChart from '../components/Charts/TimeSeriesChart';
 import StateDonutChart from '../components/Charts/StateDonutChart';
 import GroupBarChart from '../components/Charts/GroupBarChart';
 import AssigneeRanking from '../components/Charts/AssigneeRanking';
+import OrganizationStatusChart from '../components/Charts/OrganizationStatusChart';
+import TopCreatorsRanking from '../components/Charts/TopCreatorsRanking';
+import CategoryBarChart from '../components/Charts/CategoryBarChart';
 import ConnectionStatus from '../components/Common/ConnectionStatus';
 import LoadingSpinner from '../components/Common/LoadingSpinner';
 import ErrorBanner from '../components/Common/ErrorBanner';
@@ -48,9 +52,11 @@ export default function Wallboard() {
 
   const fetchOverview = useCallback(() => getOverview(days), [days]);
   const fetchTimeseries = useCallback(() => getTimeseries(days), [days]);
+  const fetchSecondary = useCallback(() => getSecondaryOverview(days), [days]);
 
   const overview = useAutoRefresh(fetchOverview, [days], REFRESH_SECONDS);
   const timeseries = useAutoRefresh(fetchTimeseries, [days], REFRESH_SECONDS);
+  const secondary = useAutoRefresh(fetchSecondary, [days], REFRESH_SECONDS);
 
   const loading = (overview.loading && !overview.data) || (settings.loading && !settings.data);
 
@@ -62,8 +68,54 @@ export default function Wallboard() {
   const showByAssignee = !widgets || widgets.chartByAssignee;
   const showStaleTickets = !widgets || widgets.chartStaleTickets;
   const showUnassignedQueue = !widgets || widgets.chartUnassignedQueue;
-  const anyChartVisible =
-    showTimeseries || showByState || showByGroup || showByAssignee || showStaleTickets || showUnassignedQueue;
+  const showByOrganization = !widgets || widgets.chartByOrganization;
+  const showTopCreators = !widgets || widgets.chartTopCreators;
+  const showByCategory = !widgets || widgets.chartByCategory;
+
+  const showStaticRow = showTimeseries || showByState;
+  const hasOpsSlide = showUnassignedQueue || showStaleTickets || showByGroup || showByAssignee;
+  const hasInsightsSlide = showByOrganization || showTopCreators || showByCategory;
+
+  const slides = [
+    hasOpsSlide && {
+      key: 'ops',
+      className: 'slide-ops',
+      content: (
+        <>
+          {showUnassignedQueue && <UnassignedQueueList tickets={overview.data?.unassignedTickets} limit={6} />}
+          {showStaleTickets && <StaleTicketsList tickets={overview.data?.staleTickets} limit={6} />}
+          {showByGroup && (
+            <GroupBarChart
+              byGroup={overview.data?.byGroup}
+              dark={isDark}
+              interactive={false}
+              height="100%"
+              limit={6}
+            />
+          )}
+          {showByAssignee && <AssigneeRanking byAssignee={overview.data?.byAssignee} interactive={false} limit={6} />}
+        </>
+      ),
+    },
+    hasInsightsSlide && {
+      key: 'insights',
+      className: 'slide-insights',
+      content: (
+        <>
+          {showByOrganization && (
+            <OrganizationStatusChart byOrganization={secondary.data?.byOrganization} dark={isDark} height="100%" />
+          )}
+          {showTopCreators && <TopCreatorsRanking topCreators={secondary.data?.topCreators} />}
+          {showByCategory && (
+            <CategoryBarChart byCategory={secondary.data?.byCategory} dark={isDark} height="100%" />
+          )}
+        </>
+      ),
+    },
+  ].filter(Boolean);
+
+  const anyChartVisible = showStaticRow || slides.length > 0;
+  const anyError = overview.error || timeseries.error || secondary.error;
 
   return (
     <div className={`wallboard-page ${isDark ? 'dark-theme' : ''}`}>
@@ -82,9 +134,6 @@ export default function Wallboard() {
                 {now.toLocaleDateString('pt-PT', { weekday: 'long', day: '2-digit', month: 'long' })}
               </span>
             </div>
-            <Link to="/insights" className="wallboard-logout" title="Clientes & Categorias">
-              <TeamOutlined />
-            </Link>
             {isAdmin && (
               <button
                 type="button"
@@ -111,42 +160,37 @@ export default function Wallboard() {
           </div>
         </header>
 
-        {(overview.error || timeseries.error) && (
-          <ErrorBanner message={overview.error || timeseries.error} onRetry={overview.refresh} />
-        )}
+        {anyError && <ErrorBanner message={anyError} onRetry={overview.refresh} />}
 
         {loading ? (
           <LoadingSpinner label="A carregar estatísticas…" />
         ) : (
           <div className="wallboard-body">
             {anyChartVisible && (
-              <div className="wallboard-charts">
-                {showTimeseries && (
-                  <TimeSeriesChart
-                    data={timeseries.data}
-                    dark={isDark}
-                    subtitle={`Últimos ${days} dia${days === 1 ? '' : 's'}`}
-                    height="100%"
-                  />
+              <div className="wallboard-charts-column">
+                {showStaticRow && (
+                  <div className="wallboard-charts wallboard-charts-static">
+                    {showTimeseries && (
+                      <TimeSeriesChart
+                        data={timeseries.data}
+                        dark={isDark}
+                        subtitle={`Últimos ${days} dia${days === 1 ? '' : 's'}`}
+                        height="100%"
+                      />
+                    )}
+                    {showByState && (
+                      <StateDonutChart
+                        byState={overview.data?.byState}
+                        dark={isDark}
+                        interactive={false}
+                        height="100%"
+                      />
+                    )}
+                  </div>
                 )}
-                {showByState && (
-                  <StateDonutChart byState={overview.data?.byState} dark={isDark} interactive={false} height="100%" />
-                )}
-                {showUnassignedQueue && (
-                  <UnassignedQueueList tickets={overview.data?.unassignedTickets} limit={6} />
-                )}
-                {showStaleTickets && <StaleTicketsList tickets={overview.data?.staleTickets} limit={6} />}
-                {showByGroup && (
-                  <GroupBarChart
-                    byGroup={overview.data?.byGroup}
-                    dark={isDark}
-                    interactive={false}
-                    height="100%"
-                    limit={6}
-                  />
-                )}
-                {showByAssignee && (
-                  <AssigneeRanking byAssignee={overview.data?.byAssignee} interactive={false} limit={6} />
+
+                {slides.length > 0 && (
+                  <WallboardCarousel slides={slides} intervalSeconds={settings.data?.carouselIntervalSeconds} />
                 )}
               </div>
             )}

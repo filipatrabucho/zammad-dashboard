@@ -11,6 +11,8 @@ const VALID_PERIODS = ['day', 'week', 'month'];
 const VALID_THEMES = ['dark', 'light'];
 const MIN_COFFEE_DURATION_S = 5;
 const MAX_COFFEE_DURATION_S = 600;
+const MIN_CAROUSEL_INTERVAL_S = 5;
+const MAX_CAROUSEL_INTERVAL_S = 120;
 
 const DEFAULT_SETTINGS = {
   period: 'month',
@@ -26,6 +28,9 @@ const DEFAULT_SETTINGS = {
     chartByAssignee: true,
     chartStaleTickets: true,
     chartUnassignedQueue: true,
+    chartByOrganization: true,
+    chartTopCreators: true,
+    chartByCategory: true,
   },
   coffeeBreak: {
     enabled: true,
@@ -33,6 +38,7 @@ const DEFAULT_SETTINGS = {
     durationSeconds: 60,
   },
   newTicketSound: true,
+  carouselIntervalSeconds: 20,
 };
 
 const WIDGET_KEYS = Object.keys(DEFAULT_SETTINGS.widgets);
@@ -63,6 +69,14 @@ function sanitizeDuration(input) {
   return n;
 }
 
+function sanitizeCarouselInterval(input) {
+  const n = parseInt(input, 10);
+  if (!Number.isInteger(n) || n < MIN_CAROUSEL_INTERVAL_S || n > MAX_CAROUSEL_INTERVAL_S) {
+    return DEFAULT_SETTINGS.carouselIntervalSeconds;
+  }
+  return n;
+}
+
 function sanitize(input) {
   const source = input && typeof input === 'object' ? input : {};
   const period = VALID_PERIODS.includes(source.period) ? source.period : DEFAULT_SETTINGS.period;
@@ -87,7 +101,9 @@ function sanitize(input) {
   const newTicketSound =
     typeof source.newTicketSound === 'boolean' ? source.newTicketSound : DEFAULT_SETTINGS.newTicketSound;
 
-  return { period, theme, widgets, coffeeBreak, newTicketSound };
+  const carouselIntervalSeconds = sanitizeCarouselInterval(source.carouselIntervalSeconds);
+
+  return { period, theme, widgets, coffeeBreak, newTicketSound, carouselIntervalSeconds };
 }
 
 function writeSettings(input) {

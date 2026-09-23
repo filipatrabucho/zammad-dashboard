@@ -31,7 +31,6 @@ export default function CoffeeBreakOverlay({ onClose }) {
       <div className="coffee-card">
         <CoffeeCupIllustration />
         <h2>Hora do café</h2>
-        <p>Já mereceste uma pausa. Volta já!</p>
       </div>
     </div>
   );

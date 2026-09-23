@@ -15,6 +15,7 @@ const ticketsRoutes = require('./routes/tickets');
 const statsRoutes = require('./routes/stats');
 const healthRoutes = require('./routes/health');
 const settingsRoutes = require('./routes/settings');
+const serversRoutes = require('./routes/servers');
 
 const app = express();
 
@@ -50,6 +51,7 @@ api.use('/tickets', authenticate, authorize, ticketsRoutes);
 api.use('/stats', authenticate, authorize, statsRoutes);
 api.use('/health', authenticate, authorize, healthRoutes);
 api.use('/settings', authenticate, authorize, settingsRoutes);
+api.use('/servers', authenticate, authorize, serversRoutes);
 
 api.use(notFoundHandler);
 api.use(errorHandler);

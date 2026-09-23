@@ -228,8 +228,14 @@ Bearer <token>` válido e o email do utilizador numa das listas do `.env`.
 | `GET /api/tickets` | Pesquisa de tickets (query, state, group, assignee, page, perPage) — usado internamente pelo som de "ticket novo" | admin/viewer |
 | `GET /api/stats/overview?days=30` | Agregações (por estado/grupo/assignee, KPIs, fila sem atribuição, tickets parados) | admin/viewer |
 | `GET /api/stats/timeseries?days=30` | Série temporal criados vs fechados | admin/viewer |
-| `GET /api/settings/wallboard` | Definições atuais do wallboard (tema, período, widgets, pausa para café, som) | admin/viewer |
+| `GET /api/stats/secondary?days=30` | Tickets por cliente, principais criadores, tickets por categoria | admin/viewer |
+| `GET /api/settings/wallboard` | Definições atuais do wallboard (tema, período, widgets, carrossel, pausa para café, som) | admin/viewer |
 | `PUT /api/settings/wallboard` | Atualiza as definições do wallboard | **admin** |
+| `GET /api/servers/status` | Estado (up/down, latência) dos servidores monitorizados, para o painel "Outros servidores" | admin/viewer |
+| `GET /api/servers` | Lista de servidores configurados (bearer token nunca é devolvido, só um preview mascarado) | **admin** |
+| `POST /api/servers` | Adiciona um servidor a monitorizar (nome, endpoint, bearer token opcional) | **admin** |
+| `PUT /api/servers/:id` | Atualiza um servidor (deixar o token em branco mantém o atual) | **admin** |
+| `DELETE /api/servers/:id` | Remove um servidor monitorizado | **admin** |
 
 Notas de segurança implementadas:
 
@@ -237,6 +243,10 @@ Notas de segurança implementadas:
 - CORS restrito à origem configurada em `FRONTEND_ORIGIN`.
 - Cache em memória (TTL configurável) para as rotas de estatísticas, para
   não sobrecarregar a instância Zammad.
+- O bearer token de cada servidor monitorizado fica guardado só no backend
+  (`backend/data/servers.json`, fora do controlo de versões) e é usado
+  apenas no próprio pedido de health-check ao endpoint configurado — nunca
+  é enviado ao browser.
 - Erros do Zammad (offline, timeout, token inválido) são tratados de forma
   consistente e nunca expõem detalhes internos ao cliente.
 
