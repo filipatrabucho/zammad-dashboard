@@ -54,6 +54,7 @@ function toPublic(server) {
     endpoint: server.endpoint,
     hasToken: Boolean(server.bearerToken),
     tokenPreview: maskToken(server.bearerToken),
+    insecureTLS: Boolean(server.insecureTLS),
   };
 }
 
@@ -61,7 +62,7 @@ function listServers() {
   return readServers().map(toPublic);
 }
 
-function createServer({ name, endpoint, bearerToken } = {}) {
+function createServer({ name, endpoint, bearerToken, insecureTLS } = {}) {
   const cleanName = sanitizeName(name);
   const cleanEndpoint = sanitizeEndpoint(endpoint);
   if (!cleanName) throw new Error('Nome é obrigatório.');
@@ -75,6 +76,7 @@ function createServer({ name, endpoint, bearerToken } = {}) {
     name: cleanName,
     endpoint: cleanEndpoint,
     bearerToken: bearerToken ? String(bearerToken).trim() : '',
+    insecureTLS: Boolean(insecureTLS),
     createdAt: new Date().toISOString(),
   };
   servers.push(server);
@@ -82,7 +84,7 @@ function createServer({ name, endpoint, bearerToken } = {}) {
   return toPublic(server);
 }
 
-function updateServer(id, { name, endpoint, bearerToken } = {}) {
+function updateServer(id, { name, endpoint, bearerToken, insecureTLS } = {}) {
   const servers = readServers();
   const index = servers.findIndex((s) => s.id === id);
   if (index === -1) throw new Error('Servidor não encontrado.');
@@ -100,6 +102,7 @@ function updateServer(id, { name, endpoint, bearerToken } = {}) {
     // Só substitui o token se vier um novo não-vazio — permite editar
     // nome/endpoint sem ter de reintroduzir sempre o bearer token.
     bearerToken: bearerToken ? String(bearerToken).trim() : existing.bearerToken,
+    insecureTLS: insecureTLS !== undefined ? Boolean(insecureTLS) : existing.insecureTLS,
     updatedAt: new Date().toISOString(),
   };
   servers[index] = updated;

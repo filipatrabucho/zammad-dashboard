@@ -3,7 +3,7 @@ import { PlusOutlined, EditOutlined, DeleteOutlined, CloseOutlined } from '@ant-
 import { getServers, createServer, updateServer, deleteServer } from '../../api/endpoints';
 import ErrorBanner from '../Common/ErrorBanner';
 
-const EMPTY_FORM = { name: '', endpoint: '', bearerToken: '' };
+const EMPTY_FORM = { name: '', endpoint: '', bearerToken: '', insecureTLS: false };
 
 export default function ServersManager() {
   const [servers, setServers] = useState([]);
@@ -25,7 +25,7 @@ export default function ServersManager() {
 
   const startEdit = (server) => {
     setEditingId(server.id);
-    setForm({ name: server.name, endpoint: server.endpoint, bearerToken: '' });
+    setForm({ name: server.name, endpoint: server.endpoint, bearerToken: '', insecureTLS: server.insecureTLS });
   };
 
   const cancelEdit = () => {
@@ -84,7 +84,14 @@ export default function ServersManager() {
           {servers.map((s) => (
             <div key={s.id} className="servers-row">
               <div className="servers-row-info">
-                <span className="servers-row-name">{s.name}</span>
+                <span className="servers-row-name">
+                  {s.name}
+                  {s.insecureTLS && (
+                    <span className="servers-row-badge" title="Verificação de certificado TLS desligada para este servidor">
+                      TLS inseguro
+                    </span>
+                  )}
+                </span>
                 <span className="servers-row-endpoint">{s.endpoint}</span>
               </div>
               <span className="servers-row-token">{s.hasToken ? `Token ${s.tokenPreview}` : 'Sem token'}</span>
@@ -141,6 +148,17 @@ export default function ServersManager() {
             placeholder={editingId ? '••••••••' : 'opcional'}
             autoComplete="new-password"
           />
+        </label>
+        <label className="servers-form-checkbox">
+          <input
+            type="checkbox"
+            checked={form.insecureTLS}
+            onChange={(e) => setForm((f) => ({ ...f, insecureTLS: e.target.checked }))}
+          />
+          <span>
+            Ignorar erros de certificado TLS
+            <small>Só para desenvolvimento (certificado autoassinado) — nunca uses isto num endpoint público.</small>
+          </span>
         </label>
         <div className="servers-form-actions">
           {editingId && (

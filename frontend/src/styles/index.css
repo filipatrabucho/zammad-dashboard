@@ -499,6 +499,25 @@ input:focus {
   font-weight: 600;
   font-size: 13.5px;
   color: var(--text-primary);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.servers-row-badge {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(250, 178, 25, 0.16);
+  color: #b3800f;
+}
+
+.dark-theme .servers-row-badge {
+  background: rgba(250, 178, 25, 0.16);
+  color: var(--warning);
 }
 
 .servers-row-endpoint {
@@ -541,12 +560,42 @@ input:focus {
   color: var(--text-secondary);
 }
 
-.servers-form input {
+.servers-form input:not([type='checkbox']) {
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-sm);
   padding: 9px 12px;
   background: var(--surface-raised);
   color: var(--text-primary);
+}
+
+.servers-form .servers-form-checkbox {
+  grid-column: 1 / -1;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.servers-form-checkbox input {
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.servers-form-checkbox span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.servers-form-checkbox small {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-muted);
 }
 
 .servers-form-actions {

@@ -1,7 +1,14 @@
+const https = require('https');
 const axios = require('axios');
 const serversStore = require('./serversStore');
 
 const CHECK_TIMEOUT_MS = 5000;
+
+// Só criado quando um servidor tem `insecureTLS` ligado explicitamente no
+// Backoffice — nunca por omissão. Serve para endpoints de desenvolvimento
+// com certificado autoassinado/CA interna não confiada pelo Node; nunca
+// deve ser usado para endpoints públicos.
+const insecureAgent = new https.Agent({ rejectUnauthorized: false });
 
 /**
  * Faz um GET ao endpoint configurado, com o bearer token (se existir).
@@ -19,6 +26,7 @@ async function checkServer(server) {
       timeout: CHECK_TIMEOUT_MS,
       headers,
       validateStatus: () => true,
+      httpsAgent: server.insecureTLS ? insecureAgent : undefined,
     });
 
     const latencyMs = Date.now() - startedAt;

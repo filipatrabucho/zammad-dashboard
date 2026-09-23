@@ -247,6 +247,11 @@ Notas de segurança implementadas:
   (`backend/data/servers.json`, fora do controlo de versões) e é usado
   apenas no próprio pedido de health-check ao endpoint configurado — nunca
   é enviado ao browser.
+- Por omissão, o health-check valida sempre o certificado TLS de cada
+  endpoint. A opção "Ignorar erros de certificado TLS" no Backoffice
+  desliga essa validação só para esse servidor específico (útil para
+  endpoints de desenvolvimento com certificado autoassinado) — nunca deve
+  ser ativada num endpoint acessível pela internet pública.
 - Erros do Zammad (offline, timeout, token inválido) são tratados de forma
   consistente e nunca expõem detalhes internos ao cliente.
 
