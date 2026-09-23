@@ -6,8 +6,15 @@ const REFRESH_SECONDS = 30;
 
 function statusLabel(server) {
   if (server.status === 'up') return server.latencyMs != null ? `${server.latencyMs}ms` : 'ok';
-  if (server.status === 'down') return 'em baixo';
+  if (server.status === 'down') return server.statusCode ? `HTTP ${server.statusCode}` : 'em baixo';
   return '—';
+}
+
+function statusTitle(server) {
+  if (server.status !== 'down') return undefined;
+  if (server.statusCode) return `Respondeu com HTTP ${server.statusCode} (não 2xx)`;
+  if (server.errorReason) return `Falha de ligação: ${server.errorReason}`;
+  return 'Falha de ligação';
 }
 
 export default function ServerStatusPanel() {
@@ -29,7 +36,7 @@ export default function ServerStatusPanel() {
       ) : (
         <div className="server-status-list">
           {servers.map((s) => (
-            <div key={s.id} className="server-status-row">
+            <div key={s.id} className="server-status-row" title={statusTitle(s)}>
               <span className={`server-dot server-dot-${s.status}`} />
               <span className="server-status-name" title={s.name}>
                 {s.name}

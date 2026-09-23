@@ -33,12 +33,25 @@ async function checkServer(server) {
       checkedAt: new Date().toISOString(),
     };
   } catch (err) {
+    // Nunca expor a stack/URL completa (pode conter query params sensíveis),
+    // mas o código do erro (ECONNREFUSED, ENOTFOUND, ETIMEDOUT, certificado
+    // TLS, etc.) é seguro e é o que normalmente explica o "down" — vai para
+    // a consola do servidor e também no campo `errorReason` da resposta,
+    // para o Backoffice conseguir mostrar a causa sem teres de ir aos logs.
+    const reason = err.code || (err.message && err.message.includes('timeout') ? 'ETIMEDOUT' : 'network_error');
+    console.warn(
+      '[servers] falha ao verificar "%s" (%s): %s',
+      server.name,
+      server.endpoint,
+      err.code || err.message
+    );
     return {
       id: server.id,
       name: server.name,
       status: 'down',
       statusCode: null,
       latencyMs: null,
+      errorReason: reason,
       checkedAt: new Date().toISOString(),
     };
   }
