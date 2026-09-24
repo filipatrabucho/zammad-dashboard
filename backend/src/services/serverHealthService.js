@@ -38,6 +38,8 @@ async function checkServer(server) {
       status: up ? 'up' : 'down',
       statusCode: response.status,
       latencyMs,
+      insecureTLS: Boolean(server.insecureTLS),
+      hasToken: Boolean(server.bearerToken),
       checkedAt: new Date().toISOString(),
     };
   } catch (err) {
@@ -60,6 +62,8 @@ async function checkServer(server) {
       statusCode: null,
       latencyMs: null,
       errorReason: reason,
+      insecureTLS: Boolean(server.insecureTLS),
+      hasToken: Boolean(server.bearerToken),
       checkedAt: new Date().toISOString(),
     };
   }
